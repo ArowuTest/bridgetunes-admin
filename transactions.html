@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridgetunes MTN Admin Portal - Transactions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Bridgetunes MTN</h4>
+                        <p class="text-white-50">Admin Portal</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="user-management.html">
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="csv-upload.html">
+                                CSV Upload
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="transactions.html">
+                                Transactions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="draw-engine.html">
+                                Draw Engine
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="notifications.html">
+                                Notifications
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="campaigns.html">
+                                Campaigns
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="analytics.html">
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="logout-link">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Transactions</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="export-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="export-dropdown">
+                            <li><a class="dropdown-item" href="#" id="export-csv">CSV</a></li>
+                            <li><a class="dropdown-item" href="#" id="export-excel">Excel</a></li>
+                            <li><a class="dropdown-item" href="#" id="export-pdf">PDF</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Transaction Filters -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                Filters
+                            </div>
+                            <div class="card-body">
+                                <form id="transaction-filter-form" class="row g-3">
+                                    <div class="col-md-3">
+                                        <label for="filter-msisdn" class="form-label">MSISDN</label>
+                                        <input type="text" class="form-control" id="filter-msisdn">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filter-date-from" class="form-label">Date From</label>
+                                        <input type="date" class="form-control" id="filter-date-from">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filter-date-to" class="form-label">Date To</label>
+                                        <input type="date" class="form-control" id="filter-date-to">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filter-amount" class="form-label">Min Amount</label>
+                                        <input type="number" class="form-control" id="filter-amount" min="0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filter-points" class="form-label">Min Points</label>
+                                        <input type="number" class="form-control" id="filter-points" min="0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filter-status" class="form-label">Status</label>
+                                        <select class="form-select" id="filter-status">
+                                            <option value="">All</option>
+                                            <option value="success">Success</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="failed">Failed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                                        <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transaction List -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Transaction List</span>
+                                <span class="badge bg-primary" id="transaction-count">1,458 Transactions</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>MSISDN</th>
+                                                <th>Amount</th>
+                                                <th>Points</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="transactions-table">
+                                            <!-- Populated by JavaScript -->
+                                            <tr>
+                                                <td>TRX-001245</td>
+                                                <td>2347012345678</td>
+                                                <td>₦500.00</td>
+                                                <td>5</td>
+                                                <td>Apr 24, 2025 10:30 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001245">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001244</td>
+                                                <td>2347023456789</td>
+                                                <td>₦1,000.00</td>
+                                                <td>10</td>
+                                                <td>Apr 24, 2025 10:15 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001244">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001243</td>
+                                                <td>2347034567890</td>
+                                                <td>₦200.00</td>
+                                                <td>2</td>
+                                                <td>Apr 24, 2025 10:05 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001243">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001242</td>
+                                                <td>2347045678901</td>
+                                                <td>₦750.00</td>
+                                                <td>7</td>
+                                                <td>Apr 24, 2025 9:55 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001242">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001241</td>
+                                                <td>2347056789012</td>
+                                                <td>₦300.00</td>
+                                                <td>3</td>
+                                                <td>Apr 24, 2025 9:45 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001241">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001240</td>
+                                                <td>2347067890123</td>
+                                                <td>₦100.00</td>
+                                                <td>1</td>
+                                                <td>Apr 24, 2025 9:30 AM</td>
+                                                <td><span class="badge bg-warning">Pending</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001240">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001239</td>
+                                                <td>2347078901234</td>
+                                                <td>₦1,500.00</td>
+                                                <td>15</td>
+                                                <td>Apr 24, 2025 9:15 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001239">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001238</td>
+                                                <td>2347089012345</td>
+                                                <td>₦250.00</td>
+                                                <td>2</td>
+                                                <td>Apr 24, 2025 9:00 AM</td>
+                                                <td><span class="badge bg-danger">Failed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001238">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001237</td>
+                                                <td>2347090123456</td>
+                                                <td>₦800.00</td>
+                                                <td>8</td>
+                                                <td>Apr 24, 2025 8:45 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001237">View</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>TRX-001236</td>
+                                                <td>2347001234567</td>
+                                                <td>₦400.00</td>
+                                                <td>4</td>
+                                                <td>Apr 24, 2025 8:30 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary view-transaction" data-id="TRX-001236">View</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <nav aria-label="Transaction pagination" class="mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction Details Modal -->
+                <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="transactionModalLabel">Transaction Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Transaction Information</h6>
+                                        <table class="table">
+                                            <tr>
+                                                <th>Transaction ID</th>
+                                                <td id="transaction-id"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>MSISDN</th>
+                                                <td id="transaction-msisdn"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Amount</th>
+                                                <td id="transaction-amount"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Points</th>
+                                                <td id="transaction-points"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Date & Time</th>
+                                                <td id="transaction-date"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Status</th>
+                                                <td id="transaction-status"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>User Information</h6>
+                                        <table class="table">
+                                            <tr>
+                                                <th>Name</th>
+                                                <td id="transaction-user-name"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Email</th>
+                                                <td id="transaction-user-email"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Phone</th>
+                                                <td id="transaction-user-phone"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Total Points</th>
+                                                <td id="transaction-user-points"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Registration Date</th>
+                                                <td id="transaction-user-reg-date"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <h6>Transaction Log</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Timestamp</th>
+                                                        <th>Event</th>
+                                                        <th>Details</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="transaction-log">
+                                                    <!-- Populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="print-transaction-btn">Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

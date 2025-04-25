@@ -4,6 +4,34 @@
 const API_BASE_URL = 'https://bridgetunes-mtn-backend.onrender.com/api';
 let authToken = null;
 let currentUser = null;
+let jackpotRolloverAmount = 0; // Track jackpot rollover amount
+
+// Prize structures
+const WEEKDAY_PRIZES = [
+    { name: 'Jackpot (1st Prize)', amount: '₦1,000,000', requiresOptIn: true },
+    { name: '2nd Prize', amount: '₦350,000', requiresOptIn: true },
+    { name: '3rd Prize', amount: '₦150,000', requiresOptIn: true },
+    { name: 'Concession Prize #1', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #2', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #3', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #4', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #5', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #6', amount: '₦75,000', requiresOptIn: true },
+    { name: 'Concession Prize #7', amount: '₦75,000', requiresOptIn: true }
+];
+
+const SATURDAY_PRIZES = [
+    { name: 'Jackpot (1st Prize)', amount: '₦3,000,000', requiresOptIn: true },
+    { name: '2nd Prize', amount: '₦1,000,000', requiresOptIn: true },
+    { name: '3rd Prize', amount: '₦500,000', requiresOptIn: true },
+    { name: 'Concession Prize #1', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #2', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #3', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #4', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #5', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #6', amount: '₦100,000', requiresOptIn: true },
+    { name: 'Concession Prize #7', amount: '₦100,000', requiresOptIn: true }
+];
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,11 +44,45 @@ document.addEventListener('DOMContentLoaded', () => {
         authToken = token;
         currentUser = JSON.parse(user);
         setupEventListeners();
+        
+        // Initialize rollover amount from localStorage or API
+        const savedRollover = localStorage.getItem('jackpotRolloverAmount');
+        if (savedRollover) {
+            jackpotRolloverAmount = parseInt(savedRollover);
+        } else {
+            // In a real implementation, this would fetch from API
+            jackpotRolloverAmount = 0;
+        }
+        
+        // Update jackpot display
+        updateJackpotDisplay();
     } else {
         // User is not logged in, redirect to login page
         window.location.href = 'index.html';
     }
 });
+
+// Update jackpot display based on day and rollover amount
+function updateJackpotDisplay() {
+    const jackpotAmountElement = document.getElementById('jackpot-amount');
+    if (jackpotAmountElement) {
+        const today = new Date();
+        const isSaturday = today.getDay() === 6;
+        
+        let baseJackpot = isSaturday ? 3000000 : 1000000;
+        let totalJackpot = baseJackpot + jackpotRolloverAmount;
+        
+        // Format as currency
+        const formattedJackpot = new Intl.NumberFormat('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(totalJackpot);
+        
+        jackpotAmountElement.textContent = formattedJackpot;
+    }
+}
 
 // Set up event listeners
 function setupEventListeners() {
@@ -64,6 +126,79 @@ function setupEventListeners() {
     
     // Export winners button
     document.getElementById('export-winners-btn').addEventListener('click', handleExportWinners);
+    
+    // Draw type change event
+    document.getElementById('draw-type').addEventListener('change', function() {
+        updatePrizeStructureDisplay();
+    });
+    
+    // Draw date change event
+    document.getElementById('draw-date').addEventListener('change', function() {
+        updatePrizeStructureDisplay();
+    });
+    
+    // Initialize prize structure display
+    updatePrizeStructureDisplay();
+}
+
+// Update prize structure display based on draw type and date
+function updatePrizeStructureDisplay() {
+    const drawType = document.getElementById('draw-type').value;
+    const drawDate = document.getElementById('draw-date').value;
+    
+    if (!drawDate || !drawType) return;
+    
+    const date = new Date(drawDate);
+    const isSaturday = date.getDay() === 6;
+    
+    // Get prize structure based on day
+    const prizeStructure = isSaturday ? SATURDAY_PRIZES : WEEKDAY_PRIZES;
+    
+    // Update prize structure display
+    const prizeStructureElement = document.getElementById('prize-structure-display');
+    if (prizeStructureElement) {
+        let html = '<h5>Prize Structure</h5><ul class="list-group">';
+        
+        // Calculate jackpot amount with rollovers
+        let jackpotAmount = isSaturday ? 3000000 : 1000000;
+        jackpotAmount += jackpotRolloverAmount;
+        
+        // Format jackpot amount
+        const formattedJackpot = new Intl.NumberFormat('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(jackpotAmount);
+        
+        // Add jackpot with rollover if applicable
+        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Jackpot (1st Prize)</span>
+                    <span>${formattedJackpot}</span>
+                </li>`;
+        
+        // Add other prizes
+        for (let i = 1; i < prizeStructure.length; i++) {
+            html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>${prizeStructure[i].name}</span>
+                        <span>${prizeStructure[i].amount}</span>
+                    </li>`;
+        }
+        
+        html += '</ul>';
+        
+        // Add note about opt-in requirement
+        html += '<div class="mt-2 small text-muted">Note: Jackpot winner must be opted-in to be valid. All other prizes require opt-in status.</div>';
+        
+        // Add rollover information if applicable
+        if (jackpotRolloverAmount > 0) {
+            html += `<div class="mt-2 alert alert-info">
+                        This jackpot includes ₦${(jackpotRolloverAmount).toLocaleString()} in rollovers from previous draws.
+                    </div>`;
+        }
+        
+        prizeStructureElement.innerHTML = html;
+    }
 }
 
 // Handle logout
@@ -143,6 +278,11 @@ async function handleRunDraw(event) {
         
         // Add draw to results table
         addDrawToResultsTable(drawName, `${drawDate} ${drawTime}`, numWinners);
+        
+        // Generate winners with proper prize structure
+        const date = new Date(drawDate);
+        const isSaturday = date.getDay() === 6;
+        generateWinners(numWinners, isSaturday);
     }, 3000);
 }
 
@@ -174,8 +314,12 @@ function showWinnersModal(drawName) {
     // Set modal title
     document.getElementById('drawWinnersModalLabel').textContent = `${drawName} - Winners`;
     
-    // Generate mock winners data
-    const winners = generateMockWinners(10);
+    // Get date from draw name to determine if it's a Saturday draw
+    const isSaturday = drawName.toLowerCase().includes('saturday') || 
+                       (drawName.includes('Weekly') && new Date().getDay() === 6);
+    
+    // Generate winners with proper prize structure
+    const winners = generateWinners(10, isSaturday);
     
     // Populate winners table
     const winnersTable = document.getElementById('winners-table');
@@ -187,8 +331,9 @@ function showWinnersModal(drawName) {
             <td>${index + 1}</td>
             <td>${winner.msisdn}</td>
             <td>${winner.name}</td>
-            <td>${winner.points}</td>
+            <td>${winner.optedIn ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-danger">No</span>'}</td>
             <td>${winner.prize}</td>
+            <td>${winner.prizeAmount}</td>
             <td><span class="badge ${winner.notified ? 'bg-success' : 'bg-warning'}">${winner.notified ? 'Notified' : 'Pending'}</span></td>
         `;
         winnersTable.appendChild(row);
@@ -199,19 +344,64 @@ function showWinnersModal(drawName) {
     modal.show();
 }
 
-// Generate mock winners data
-function generateMockWinners(count) {
+// Generate winners with proper prize structure
+function generateWinners(count, isSaturday) {
     const winners = [];
-    const prizes = ['₦10,000', '₦5,000', '₦2,000', '₦1,000', '₦500'];
+    const prizeStructure = isSaturday ? SATURDAY_PRIZES : WEEKDAY_PRIZES;
     
-    for (let i = 0; i < count; i++) {
+    // Calculate jackpot amount with rollovers
+    let jackpotAmount = isSaturday ? 3000000 : 1000000;
+    jackpotAmount += jackpotRolloverAmount;
+    
+    // Format jackpot amount
+    const formattedJackpot = new Intl.NumberFormat('en-NG', {
+        style: 'currency',
+        currency: 'NGN',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(jackpotAmount);
+    
+    // Generate winners
+    for (let i = 0; i < count && i < prizeStructure.length; i++) {
+        // For jackpot winner, randomly determine if they're opted in
+        const isJackpot = i === 0;
+        const optedIn = isJackpot ? Math.random() > 0.3 : true; // 70% chance of jackpot winner being opted in, all others must be opted in
+        
+        // Determine prize amount
+        let prizeAmount = isJackpot ? formattedJackpot : prizeStructure[i].amount;
+        
+        // Create winner object
         winners.push({
             msisdn: `234${Math.floor(7000000000 + Math.random() * 1000000000)}`,
             name: `User ${i + 1}`,
-            points: Math.floor(1 + Math.random() * 10),
-            prize: prizes[Math.min(i, prizes.length - 1)],
-            notified: Math.random() > 0.5
+            optedIn: optedIn,
+            prize: prizeStructure[i].name,
+            prizeAmount: prizeAmount,
+            notified: Math.random() > 0.5,
+            valid: optedIn || !isJackpot // Valid if opted in or not a jackpot winner
         });
+    }
+    
+    // Check if jackpot winner is valid
+    const jackpotWinner = winners[0];
+    if (!jackpotWinner.optedIn) {
+        // Jackpot winner is not opted in, mark as invalid and trigger rollover
+        jackpotWinner.status = 'Invalid - Not Opted In';
+        
+        // Update rollover amount
+        const rolloverValue = isSaturday ? jackpotAmount : 1000000;
+        jackpotRolloverAmount += rolloverValue;
+        
+        // Save to localStorage (in a real app, this would be saved to the server)
+        localStorage.setItem('jackpotRolloverAmount', jackpotRolloverAmount.toString());
+        
+        // Add rollover note to winner
+        jackpotWinner.notes = `Jackpot rolled over (₦${rolloverValue.toLocaleString()})`;
+    } else {
+        // Valid jackpot winner, reset rollover
+        jackpotWinner.status = 'Valid';
+        jackpotRolloverAmount = 0;
+        localStorage.setItem('jackpotRolloverAmount', '0');
     }
     
     return winners;
@@ -226,8 +416,10 @@ function handleNotifyWinners() {
     // Update status badges
     const badges = document.querySelectorAll('#winners-table .badge');
     badges.forEach(badge => {
-        badge.className = 'badge bg-success';
-        badge.textContent = 'Notified';
+        if (badge.textContent === 'Pending') {
+            badge.className = 'badge bg-success';
+            badge.textContent = 'Notified';
+        }
     });
 }
 

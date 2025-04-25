@@ -6,13 +6,6 @@ let currentPage = 'dashboard';
 let transactionsPage = 1;
 let transactionsPerPage = 10;
 
-// DOM elements
-const authContainer = document.getElementById('auth-container');
-const dashboardContainer = document.getElementById('dashboard-container');
-const usersContainer = document.getElementById('users-container');
-const uploadContainer = document.getElementById('upload-container');
-const transactionsContainer = document.getElementById('transactions-container');
-
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     // Check if user is logged in
@@ -37,25 +30,36 @@ document.addEventListener('DOMContentLoaded', () => {
 // Set up event listeners
 function setupEventListeners() {
     // Auth event listeners
-    document.getElementById('login-form').addEventListener('submit', handleLogin);
-    document.getElementById('register-form').addEventListener('submit', handleRegister);
+    if (document.getElementById('login-form')) {
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+    }
     
-    // Navigation event listeners
-    document.getElementById('dashboard-link').addEventListener('click', () => navigateTo('dashboard'));
-    document.getElementById('users-link').addEventListener('click', () => navigateTo('users'));
-    document.getElementById('upload-link').addEventListener('click', () => navigateTo('upload'));
-    document.getElementById('transactions-link').addEventListener('click', () => navigateTo('transactions'));
-    document.getElementById('logout-link').addEventListener('click', handleLogout);
+    if (document.getElementById('register-form')) {
+        document.getElementById('register-form').addEventListener('submit', handleRegister);
+    }
+    
+    // Logout event listener
+    if (document.getElementById('logout-link')) {
+        document.getElementById('logout-link').addEventListener('click', handleLogout);
+    }
     
     // Admin creation
-    document.getElementById('create-admin-btn').addEventListener('click', showCreateAdminModal);
-    document.getElementById('submit-admin-btn').addEventListener('click', handleCreateAdmin);
+    if (document.getElementById('create-admin-btn')) {
+        document.getElementById('create-admin-btn').addEventListener('click', showCreateAdminModal);
+    }
     
-    // CSV upload
-    document.getElementById('csv-upload-form').addEventListener('submit', handleCSVUpload);
+    if (document.getElementById('create-admin-submit')) {
+        document.getElementById('create-admin-submit').addEventListener('click', handleCreateAdmin);
+    }
     
-    // Transaction search
-    document.getElementById('search-btn').addEventListener('click', handleTransactionSearch);
+    // Password reset
+    if (document.getElementById('forgot-password-link')) {
+        document.getElementById('forgot-password-link').addEventListener('click', showForgotPasswordForm);
+    }
+    
+    if (document.getElementById('reset-password-form')) {
+        document.getElementById('reset-password-form').addEventListener('submit', handlePasswordReset);
+    }
 }
 
 // Authentication functions
@@ -169,79 +173,109 @@ function handleLogout() {
     
     // Show login UI
     showLoginUI();
+    
+    // Redirect to index page if not already there
+    if (window.location.pathname !== '/index.html' && window.location.pathname !== '/') {
+        window.location.href = 'index.html';
+    }
+}
+
+// Password reset functions
+function showForgotPasswordForm() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('reset-password-form').style.display = 'block';
+}
+
+async function handlePasswordReset(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('reset-email').value;
+    const errorElement = document.getElementById('reset-error');
+    const successElement = document.getElementById('reset-success');
+    
+    try {
+        errorElement.style.display = 'none';
+        successElement.style.display = 'none';
+        
+        // In a real application, this would call an API endpoint
+        // For now, we'll simulate a successful password reset
+        
+        // Show success message
+        successElement.textContent = 'Password reset instructions have been sent to your email.';
+        successElement.style.display = 'block';
+        
+        // Clear form
+        document.getElementById('reset-password-form').reset();
+        
+        // After 3 seconds, switch back to login form
+        setTimeout(() => {
+            document.getElementById('reset-password-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        }, 3000);
+    } catch (error) {
+        errorElement.textContent = error.message;
+        errorElement.style.display = 'block';
+    }
 }
 
 // UI functions
 function showLoginUI() {
-    authContainer.style.display = 'flex';
-    dashboardContainer.style.display = 'none';
-    usersContainer.style.display = 'none';
-    uploadContainer.style.display = 'none';
-    transactionsContainer.style.display = 'none';
+    const authContainer = document.getElementById('auth-container');
+    if (authContainer) {
+        authContainer.style.display = 'flex';
+    }
+    
+    const dashboardContainer = document.getElementById('dashboard-container');
+    if (dashboardContainer) {
+        dashboardContainer.style.display = 'none';
+    }
     
     // Hide sidebar
-    document.getElementById('sidebar').classList.add('d-none');
-    document.getElementById('sidebar').classList.remove('d-md-block');
-}
-
-function showLoggedInUI() {
-    authContainer.style.display = 'none';
-    
-    // Show sidebar
-    document.getElementById('sidebar').classList.remove('d-none');
-    document.getElementById('sidebar').classList.add('d-md-block');
-    
-    // Update user role badge
-    document.getElementById('user-role').textContent = currentUser.role.toUpperCase();
-    
-    // Show appropriate container based on current page
-    navigateTo(currentPage);
-    
-    // Check if user is admin
-    if (currentUser.role !== 'admin') {
-        // Hide admin-only elements
-        document.getElementById('create-admin-btn').style.display = 'none';
-    } else {
-        document.getElementById('create-admin-btn').style.display = 'block';
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.classList.add('d-none');
+        sidebar.classList.remove('d-md-block');
     }
 }
 
-function navigateTo(page) {
-    // Update current page
-    currentPage = page;
+function showLoggedInUI() {
+    const authContainer = document.getElementById('auth-container');
+    if (authContainer) {
+        authContainer.style.display = 'none';
+    }
     
-    // Hide all containers
-    dashboardContainer.style.display = 'none';
-    usersContainer.style.display = 'none';
-    uploadContainer.style.display = 'none';
-    transactionsContainer.style.display = 'none';
+    // Show sidebar
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.classList.remove('d-none');
+        sidebar.classList.add('d-md-block');
+    }
     
-    // Remove active class from all nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-    });
+    // Update user role badge
+    const userRoleElement = document.getElementById('user-role');
+    if (userRoleElement && currentUser) {
+        userRoleElement.textContent = currentUser.role.toUpperCase();
+    }
     
-    // Show appropriate container and set active nav link
-    switch (page) {
-        case 'dashboard':
-            dashboardContainer.style.display = 'block';
-            document.getElementById('dashboard-link').classList.add('active');
-            loadDashboard();
-            break;
-        case 'users':
-            usersContainer.style.display = 'block';
-            document.getElementById('users-link').classList.add('active');
-            loadUsers();
-            break;
-        case 'upload':
-            uploadContainer.style.display = 'block';
-            document.getElementById('upload-link').classList.add('active');
-            break;
-        case 'transactions':
-            transactionsContainer.style.display = 'block';
-            document.getElementById('transactions-link').classList.add('active');
-            loadTransactions();
-            break;
+    // Show dashboard by default
+    const dashboardContainer = document.getElementById('dashboard-container');
+    if (dashboardContainer) {
+        dashboardContainer.style.display = 'block';
+        loadDashboard();
+    }
+    
+    // Check if user is admin
+    if (currentUser && currentUser.role !== 'admin') {
+        // Hide admin-only elements
+        const createAdminBtn = document.getElementById('create-admin-btn');
+        if (createAdminBtn) {
+            createAdminBtn.style.display = 'none';
+        }
+    } else if (currentUser) {
+        const createAdminBtn = document.getElementById('create-admin-btn');
+        if (createAdminBtn) {
+            createAdminBtn.style.display = 'block';
+        }
     }
 }
 
@@ -258,38 +292,53 @@ async function loadDashboard() {
         ]);
         
         // Update dashboard UI
-        document.getElementById('total-users').textContent = usersCount;
-        document.getElementById('total-transactions').textContent = transactionsCount;
-        document.getElementById('total-points').textContent = pointsSum;
+        const totalUsersElement = document.getElementById('total-users');
+        if (totalUsersElement) {
+            totalUsersElement.textContent = usersCount;
+        }
+        
+        const totalTransactionsElement = document.getElementById('total-transactions');
+        if (totalTransactionsElement) {
+            totalTransactionsElement.textContent = transactionsCount;
+        }
+        
+        const totalPointsElement = document.getElementById('total-points');
+        if (totalPointsElement) {
+            totalPointsElement.textContent = pointsSum;
+        }
         
         // Populate recent users table
         const recentUsersTable = document.getElementById('recent-users-table');
-        recentUsersTable.innerHTML = '';
-        
-        recentUsers.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.firstName} ${user.lastName}</td>
-                <td>${user.email}</td>
-                <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${user.role}</span></td>
-            `;
-            recentUsersTable.appendChild(row);
-        });
+        if (recentUsersTable) {
+            recentUsersTable.innerHTML = '';
+            
+            recentUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.email}</td>
+                    <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${user.role}</span></td>
+                `;
+                recentUsersTable.appendChild(row);
+            });
+        }
         
         // Populate recent transactions table
         const recentTransactionsTable = document.getElementById('recent-transactions-table');
-        recentTransactionsTable.innerHTML = '';
-        
-        recentTransactions.forEach(transaction => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${transaction.msisdn}</td>
-                <td>₦${transaction.rechargeAmount.toFixed(2)}</td>
-                <td>${transaction.points}</td>
-                <td>${new Date(transaction.rechargeDate).toLocaleDateString()}</td>
-            `;
-            recentTransactionsTable.appendChild(row);
-        });
+        if (recentTransactionsTable) {
+            recentTransactionsTable.innerHTML = '';
+            
+            recentTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.msisdn}</td>
+                    <td>₦${transaction.rechargeAmount.toFixed(2)}</td>
+                    <td>${transaction.points}</td>
+                    <td>${new Date(transaction.rechargeDate).toLocaleDateString()}</td>
+                `;
+                recentTransactionsTable.appendChild(row);
+            });
+        }
     } catch (error) {
         console.error('Error loading dashboard:', error);
     }
@@ -352,34 +401,36 @@ async function loadUsers() {
         
         // Populate users table
         const usersTable = document.getElementById('users-table');
-        usersTable.innerHTML = '';
-        
-        users.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.firstName} ${user.lastName}</td>
-                <td>${user.email}</td>
-                <td>${user.phone}</td>
-                <td>${user.msisdn}</td>
-                <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${user.role}</span></td>
-                <td><span class="badge ${user.optInStatus ? 'bg-success' : 'bg-secondary'}">${user.optInStatus ? 'Opted In' : 'Opted Out'}</span></td>
-                <td>${user.points}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary view-user" data-id="${user.id}">View</button>
-                    <button class="btn btn-sm btn-outline-danger ${currentUser.role !== 'admin' ? 'disabled' : ''}" ${currentUser.role !== 'admin' ? 'disabled' : ''} data-id="${user.id}">Delete</button>
-                </td>
-            `;
-            usersTable.appendChild(row);
-        });
-        
-        // Add event listeners to view buttons
-        document.querySelectorAll('.view-user').forEach(button => {
-            button.addEventListener('click', () => {
-                const userId = button.getAttribute('data-id');
-                // In a real application, this would navigate to a user details page
-                alert(`View user ${userId}`);
+        if (usersTable) {
+            usersTable.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.msisdn}</td>
+                    <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${user.role}</span></td>
+                    <td><span class="badge ${user.optInStatus ? 'bg-success' : 'bg-secondary'}">${user.optInStatus ? 'Opted In' : 'Opted Out'}</span></td>
+                    <td>${user.points}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary view-user" data-id="${user.id}">View</button>
+                        <button class="btn btn-sm btn-outline-danger ${currentUser.role !== 'admin' ? 'disabled' : ''}" ${currentUser.role !== 'admin' ? 'disabled' : ''} data-id="${user.id}">Delete</button>
+                    </td>
+                `;
+                usersTable.appendChild(row);
             });
-        });
+            
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-user').forEach(button => {
+                button.addEventListener('click', () => {
+                    const userId = button.getAttribute('data-id');
+                    // In a real application, this would navigate to a user details page
+                    alert(`View user ${userId}`);
+                });
+            });
+        }
     } catch (error) {
         console.error('Error loading users:', error);
     }
@@ -387,8 +438,11 @@ async function loadUsers() {
 
 function showCreateAdminModal() {
     // Show the create admin modal
-    const modal = new bootstrap.Modal(document.getElementById('createAdminModal'));
-    modal.show();
+    const createAdminModal = document.getElementById('createAdminModal');
+    if (createAdminModal) {
+        const modal = new bootstrap.Modal(createAdminModal);
+        modal.show();
+    }
 }
 
 async function handleCreateAdmin() {
@@ -399,11 +453,7 @@ async function handleCreateAdmin() {
     const msisdn = document.getElementById('admin-msisdn').value;
     const password = document.getElementById('admin-password').value;
     
-    const errorElement = document.getElementById('admin-error');
-    
     try {
-        errorElement.style.display = 'none';
-        
         const response = await fetch(`${API_BASE_URL}/auth/admin`, {
             method: 'POST',
             headers: {
@@ -416,220 +466,30 @@ async function handleCreateAdmin() {
                 email,
                 phone,
                 msisdn,
-                password
+                password,
+                role: 'admin'
             })
         });
         
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to create admin');
+            throw new Error(data.error || 'Failed to create admin user');
         }
         
         // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('createAdminModal'));
-        modal.hide();
+        const createAdminModal = document.getElementById('createAdminModal');
+        if (createAdminModal) {
+            const modal = bootstrap.Modal.getInstance(createAdminModal);
+            modal.hide();
+        }
         
         // Reload users
         loadUsers();
         
-        // Show success alert
-        alert('Admin created successfully');
-    } catch (error) {
-        errorElement.textContent = error.message;
-        errorElement.style.display = 'block';
-    }
-}
-
-// CSV upload functions
-async function handleCSVUpload(event) {
-    event.preventDefault();
-    
-    const fileInput = document.getElementById('csv-file');
-    const file = fileInput.files[0];
-    
-    if (!file) {
-        document.getElementById('upload-error').textContent = 'Please select a file';
-        document.getElementById('upload-error').style.display = 'block';
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const progressBar = document.getElementById('upload-progress');
-    const progressBarInner = progressBar.querySelector('.progress-bar');
-    const errorElement = document.getElementById('upload-error');
-    const successElement = document.getElementById('upload-success');
-    
-    try {
-        // Reset UI
-        errorElement.style.display = 'none';
-        successElement.style.display = 'none';
-        progressBar.style.display = 'block';
-        progressBarInner.style.width = '0%';
-        
-        // Simulate progress (in a real app, this would use fetch with progress events)
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += 10;
-            progressBarInner.style.width = `${progress}%`;
-            
-            if (progress >= 100) {
-                clearInterval(progressInterval);
-            }
-        }, 300);
-        
-        const response = await fetch(`${API_BASE_URL}/upload/transactions`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: formData
-        });
-        
-        clearInterval(progressInterval);
-        progressBarInner.style.width = '100%';
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'Upload failed');
-        }
-        
         // Show success message
-        successElement.textContent = `Upload successful! Processed ${data.totalRecords} records, inserted ${data.inserted} records.`;
-        successElement.style.display = 'block';
-        
-        // Clear form
-        document.getElementById('csv-upload-form').reset();
-        
-        // Hide progress bar after a delay
-        setTimeout(() => {
-            progressBar.style.display = 'none';
-        }, 2000);
+        alert('Admin user created successfully');
     } catch (error) {
-        // Show error message
-        errorElement.textContent = error.message;
-        errorElement.style.display = 'block';
-        
-        // Hide progress bar
-        progressBar.style.display = 'none';
+        alert(`Error: ${error.message}`);
     }
 }
-
-// Transaction functions
-async function loadTransactions(page = 1, msisdnFilter = '') {
-    try {
-        transactionsPage = page;
-        
-        // In a real application, this would fetch transactions from the API
-        // For now, we'll use mock data
-        let transactions = [
-            { msisdn: '2347012345678', rechargeAmount: 500, optInStatus: true, rechargeDate: '2025-04-20T10:30:00Z', points: 5 },
-            { msisdn: '2347023456789', rechargeAmount: 1000, optInStatus: true, rechargeDate: '2025-04-21T11:45:00Z', points: 10 },
-            { msisdn: '2347034567890', rechargeAmount: 200, optInStatus: false, rechargeDate: '2025-04-22T09:15:00Z', points: 2 },
-            { msisdn: '2347045678901', rechargeAmount: 750, optInStatus: true, rechargeDate: '2025-04-23T14:20:00Z', points: 7 },
-            { msisdn: '2347056789012', rechargeAmount: 300, optInStatus: true, rechargeDate: '2025-04-24T16:10:00Z', points: 3 },
-            { msisdn: '2347067890123', rechargeAmount: 100, optInStatus: true, rechargeDate: '2025-04-20T08:05:00Z', points: 1 },
-            { msisdn: '2347078901234', rechargeAmount: 1500, optInStatus: true, rechargeDate: '2025-04-21T13:30:00Z', points: 10 },
-            { msisdn: '2347089012345', rechargeAmount: 250, optInStatus: false, rechargeDate: '2025-04-22T10:45:00Z', points: 2 },
-            { msisdn: '2347090123456', rechargeAmount: 800, optInStatus: true, rechargeDate: '2025-04-23T15:50:00Z', points: 8 },
-            { msisdn: '2347001234567', rechargeAmount: 350, optInStatus: true, rechargeDate: '2025-04-24T17:40:00Z', points: 3 },
-            { msisdn: '2347012345678', rechargeAmount: 600, optInStatus: true, rechargeDate: '2025-04-20T09:20:00Z', points: 6 },
-            { msisdn: '2347023456789', rechargeAmount: 1200, optInStatus: true, rechargeDate: '2025-04-21T12:15:00Z', points: 10 },
-            { msisdn: '2347034567890', rechargeAmount: 150, optInStatus: false, rechargeDate: '2025-04-22T08:30:00Z', points: 1 },
-            { msisdn: '2347045678901', rechargeAmount: 900, optInStatus: true, rechargeDate: '2025-04-23T16:05:00Z', points: 9 },
-            { msisdn: '2347056789012', rechargeAmount: 400, optInStatus: true, rechargeDate: '2025-04-24T18:25:00Z', points: 4 }
-        ];
-        
-        // Apply MSISDN filter if provided
-        if (msisdnFilter) {
-            transactions = transactions.filter(t => t.msisdn.includes(msisdnFilter));
-        }
-        
-        // Calculate pagination
-        const totalTransactions = transactions.length;
-        const totalPages = Math.ceil(totalTransactions / transactionsPerPage);
-        const startIndex = (page - 1) * transactionsPerPage;
-        const endIndex = startIndex + transactionsPerPage;
-        const paginatedTransactions = transactions.slice(startIndex, endIndex);
-        
-        // Populate transactions table
-        const transactionsTable = document.getElementById('transactions-table');
-        transactionsTable.innerHTML = '';
-        
-        paginatedTransactions.forEach(transaction => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${transaction.msisdn}</td>
-                <td>₦${transaction.rechargeAmount.toFixed(2)}</td>
-                <td><span class="badge ${transaction.optInStatus ? 'bg-success' : 'bg-secondary'}">${transaction.optInStatus ? 'Yes' : 'No'}</span></td>
-                <td>${new Date(transaction.rechargeDate).toLocaleDateString()}</td>
-                <td>${transaction.points}</td>
-            `;
-            transactionsTable.appendChild(row);
-        });
-        
-        // Update pagination
-        const paginationElement = document.getElementById('transactions-pagination');
-        paginationElement.innerHTML = '';
-        
-        // Previous button
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${page === 1 ? 'disabled' : ''}`;
-        prevLi.innerHTML = `<a class="page-link" href="#" ${page === 1 ? 'tabindex="-1" aria-disabled="true"' : ''}>Previous</a>`;
-        prevLi.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (page > 1) {
-                loadTransactions(page - 1, msisdnFilter);
-            }
-        });
-        paginationElement.appendChild(prevLi);
-        
-        // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            const pageLi = document.createElement('li');
-            pageLi.className = `page-item ${i === page ? 'active' : ''}`;
-            pageLi.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-            pageLi.addEventListener('click', (e) => {
-                e.preventDefault();
-                loadTransactions(i, msisdnFilter);
-            });
-            paginationElement.appendChild(pageLi);
-        }
-        
-        // Next button
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${page === totalPages ? 'disabled' : ''}`;
-        nextLi.innerHTML = `<a class="page-link" href="#" ${page === totalPages ? 'tabindex="-1" aria-disabled="true"' : ''}>Next</a>`;
-        nextLi.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (page < totalPages) {
-                loadTransactions(page + 1, msisdnFilter);
-            }
-        });
-        paginationElement.appendChild(nextLi);
-    } catch (error) {
-        console.error('Error loading transactions:', error);
-    }
-}
-
-function handleTransactionSearch() {
-    const msisdnFilter = document.getElementById('search-msisdn').value;
-    loadTransactions(1, msisdnFilter);
-}
-
-// Helper functions
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-}
-
-// Initialize Bootstrap tooltips
-document.addEventListener('DOMContentLoaded', function () {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});

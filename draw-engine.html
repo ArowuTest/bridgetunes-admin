@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridgetunes MTN Admin Portal - Draw Engine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Bridgetunes MTN</h4>
+                        <p class="text-white-50">Draw Engine</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="draw-engine.html">
+                                Draw Engine
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Notifications
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Campaigns
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link text-danger" href="#" id="logout-link">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Draw Engine</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-sm btn-primary" id="create-draw-btn">
+                            Create New Draw
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Draw Configuration -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Configure Draw
+                            </div>
+                            <div class="card-body">
+                                <form id="draw-config-form">
+                                    <div class="mb-3">
+                                        <label for="draw-name" class="form-label">Draw Name</label>
+                                        <input type="text" class="form-control" id="draw-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="draw-date" class="form-label">Draw Date</label>
+                                        <input type="date" class="form-control" id="draw-date" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="draw-time" class="form-label">Draw Time</label>
+                                        <input type="time" class="form-control" id="draw-time" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="draw-type" class="form-label">Draw Type</label>
+                                        <select class="form-select" id="draw-type" required>
+                                            <option value="">Select Draw Type</option>
+                                            <option value="daily">Daily Draw</option>
+                                            <option value="weekly">Weekly Draw</option>
+                                            <option value="monthly">Monthly Draw</option>
+                                            <option value="special">Special Draw</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="num-winners" class="form-label">Number of Winners</label>
+                                        <input type="number" class="form-control" id="num-winners" min="1" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Eligible Transactions</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="filter-date-range" checked>
+                                            <label class="form-check-label" for="filter-date-range">
+                                                Filter by Date Range
+                                            </label>
+                                        </div>
+                                        <div class="row mt-2" id="date-range-inputs">
+                                            <div class="col-md-6">
+                                                <input type="date" class="form-control" id="start-date" required>
+                                                <div class="form-text">Start Date</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="date" class="form-control" id="end-date" required>
+                                                <div class="form-text">End Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="filter-msisdn-ending">
+                                            <label class="form-check-label" for="filter-msisdn-ending">
+                                                Filter by MSISDN Ending Digits
+                                            </label>
+                                        </div>
+                                        <div class="mt-2" id="msisdn-ending-inputs" style="display: none;">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-0" value="0">
+                                                        <label class="form-check-label" for="ending-0">0</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-1" value="1">
+                                                        <label class="form-check-label" for="ending-1">1</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-2" value="2">
+                                                        <label class="form-check-label" for="ending-2">2</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-3" value="3">
+                                                        <label class="form-check-label" for="ending-3">3</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-4" value="4">
+                                                        <label class="form-check-label" for="ending-4">4</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-5" value="5">
+                                                        <label class="form-check-label" for="ending-5">5</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-6" value="6">
+                                                        <label class="form-check-label" for="ending-6">6</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-7" value="7">
+                                                        <label class="form-check-label" for="ending-7">7</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-8" value="8">
+                                                        <label class="form-check-label" for="ending-8">8</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="ending-9" value="9">
+                                                        <label class="form-check-label" for="ending-9">9</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="filter-min-points">
+                                            <label class="form-check-label" for="filter-min-points">
+                                                Filter by Minimum Points
+                                            </label>
+                                        </div>
+                                        <div class="mt-2" id="min-points-input" style="display: none;">
+                                            <input type="number" class="form-control" id="min-points" min="1" value="1">
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">Run Draw</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Draw Schedule
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Draw Name</th>
+                                                <th>Type</th>
+                                                <th>Date & Time</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="draw-schedule-table">
+                                            <tr>
+                                                <td>Daily Draw #1</td>
+                                                <td>Daily</td>
+                                                <td>Apr 26, 2025 12:00 PM</td>
+                                                <td><span class="badge bg-warning">Scheduled</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Weekly Draw #5</td>
+                                                <td>Weekly</td>
+                                                <td>Apr 28, 2025 3:00 PM</td>
+                                                <td><span class="badge bg-warning">Scheduled</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Special Promo Draw</td>
+                                                <td>Special</td>
+                                                <td>May 1, 2025 6:00 PM</td>
+                                                <td><span class="badge bg-warning">Scheduled</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Draw Results -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                Draw Results
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Draw Name</th>
+                                                <th>Date & Time</th>
+                                                <th>Winners</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="draw-results-table">
+                                            <tr>
+                                                <td>Daily Draw #0</td>
+                                                <td>Apr 25, 2025 12:00 PM</td>
+                                                <td>5</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">View Winners</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Export</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Weekly Draw #4</td>
+                                                <td>Apr 21, 2025 3:00 PM</td>
+                                                <td>10</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">View Winners</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Export</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Monthly Draw #1</td>
+                                                <td>Apr 1, 2025 6:00 PM</td>
+                                                <td>20</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">View Winners</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Export</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Draw Winners Modal -->
+                <div class="modal fade" id="drawWinnersModal" tabindex="-1" aria-labelledby="drawWinnersModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="drawWinnersModalLabel">Draw Winners</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>MSISDN</th>
+                                                <th>Name</th>
+                                                <th>Points</th>
+                                                <th>Prize</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="winners-table">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="notify-winners-btn">Notify Winners</button>
+                                <button type="button" class="btn btn-secondary" id="export-winners-btn">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Run Draw Modal -->
+                <div class="modal fade" id="runDrawModal" tabindex="-1" aria-labelledby="runDrawModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="runDrawModalLabel">Running Draw</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div id="draw-running">
+                                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <h4 class="mt-3">Running Draw...</h4>
+                                    <p>Please wait while we select the winners.</p>
+                                </div>
+                                <div id="draw-complete" style="display: none;">
+                                    <div class="text-success mb-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                        </svg>
+                                    </div>
+                                    <h4>Draw Complete!</h4>
+                                    <p>The draw has been completed successfully.</p>
+                                    <div class="alert alert-success">
+                                        <strong id="winners-count">0</strong> winners have been selected.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="view-winners-btn" style="display: none;">View Winners</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="draw-engine.js"></script>
+</body>
+</html>

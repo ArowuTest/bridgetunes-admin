@@ -1,0 +1,106 @@
+<!-- Dashboard Template -->
+<div class="dashboard-container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Statistics</h5>
+                    <div class="stat-container">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-users">0</span>
+                            <span class="stat-label">Total Users</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="active-users">0</span>
+                            <span class="stat-label">Active Users</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Draw Statistics</h5>
+                    <div class="stat-container">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-draws">0</span>
+                            <span class="stat-label">Total Draws</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-winners">0</span>
+                            <span class="stat-label">Total Winners</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Notification Statistics</h5>
+                    <div class="stat-container">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-notifications">0</span>
+                            <span class="stat-label">Total Notifications</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="active-campaigns">0</span>
+                            <span class="stat-label">Active Campaigns</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Draws</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Draw Type</th>
+                                    <th>Winners</th>
+                                    <th>Prize</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-draws-table">
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent draws</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Notifications</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Campaign</th>
+                                    <th>Recipients</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-notifications-table">
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent notifications</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

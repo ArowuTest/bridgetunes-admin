@@ -370,7 +370,8 @@
             
             <div id="alert-container"></div>
             
-            <form id="login-form" class="login-form">
+            <!-- Changed form method to POST to prevent credentials in URL -->
+            <form id="login-form" class="login-form" method="POST" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <div class="input-wrapper">
@@ -391,7 +392,7 @@
                     </button>
                 </div>
                 <div class="form-links">
-                    <a href="forgot-password.html">Forgot Password?</a>
+                    <a href="#" onclick="showForgotPassword(event)">Forgot Password?</a>
                 </div>
             </form>
         </div>
@@ -482,8 +483,5 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-value">5,432</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                
+                            <div class="s
 (Content truncated due to size limit. Use line ranges to read in chunks)

@@ -1,0 +1,105 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "fsanus",
+      "email": "fsanus20111@gmail.com",
+      "password": "admin123",
+      "userType": "super_admin",
+      "organization": "Bridgetunes",
+      "isActive": true,
+      "lastLogin": "2025-04-25T10:30:00Z"
+    },
+    {
+      "id": "2",
+      "username": "admin1",
+      "email": "admin1@bridgetunes.com",
+      "password": "admin123",
+      "userType": "admin",
+      "organization": "Bridgetunes",
+      "isActive": true,
+      "lastLogin": "2025-04-24T14:20:00Z"
+    },
+    {
+      "id": "3",
+      "username": "admin2",
+      "email": "admin2@bridgetunes.com",
+      "password": "admin123",
+      "userType": "admin",
+      "organization": "Bridgetunes",
+      "isActive": true,
+      "lastLogin": "2025-04-23T09:15:00Z"
+    },
+    {
+      "id": "4",
+      "username": "mtn_manager",
+      "email": "manager@mtn.com",
+      "password": "admin123",
+      "userType": "admin",
+      "organization": "MTN",
+      "isActive": true,
+      "lastLogin": "2025-04-22T16:45:00Z"
+    },
+    {
+      "id": "5",
+      "username": "staff1",
+      "email": "staff1@bridgetunes.com",
+      "password": "admin123",
+      "userType": "staff",
+      "organization": "Bridgetunes",
+      "isActive": true,
+      "lastLogin": "2025-04-21T11:30:00Z"
+    },
+    {
+      "id": "6",
+      "username": "mtn_staff",
+      "email": "staff@mtn.com",
+      "password": "admin123",
+      "userType": "staff",
+      "organization": "MTN",
+      "isActive": true,
+      "lastLogin": "2025-04-20T08:20:00Z"
+    }
+  ],
+  "permissions": {
+    "super_admin": {
+      "canCreateAdmin": true,
+      "canDeleteAdmin": true,
+      "canModifyPermissions": true,
+      "canAccessAllModules": true,
+      "canExecuteDraws": true,
+      "canManageCampaigns": true,
+      "canExportData": true,
+      "canImportData": true,
+      "canManageUsers": true,
+      "canViewAnalytics": true,
+      "canManageSettings": true
+    },
+    "admin": {
+      "canCreateAdmin": false,
+      "canDeleteAdmin": false,
+      "canModifyPermissions": false,
+      "canAccessAllModules": true,
+      "canExecuteDraws": true,
+      "canManageCampaigns": true,
+      "canExportData": true,
+      "canImportData": true,
+      "canManageUsers": true,
+      "canViewAnalytics": true,
+      "canManageSettings": false
+    },
+    "staff": {
+      "canCreateAdmin": false,
+      "canDeleteAdmin": false,
+      "canModifyPermissions": false,
+      "canAccessAllModules": false,
+      "canExecuteDraws": false,
+      "canManageCampaigns": false,
+      "canExportData": true,
+      "canImportData": false,
+      "canManageUsers": false,
+      "canViewAnalytics": true,
+      "canManageSettings": false
+    }
+  }
+}

@@ -5,345 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bridgetunes Admin Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Keep the original CSS link -->
     <link rel="stylesheet" href="css/admin-styles.css">
-    
-    <!-- Add inline CSS for immediate styling as fallback -->
-    <style>
-        /* Modern styling for login page */
-        :root {
-            --primary-color: #3B82F6;
-            --primary-dark: #2563EB;
-            --secondary-color: #6366F1;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --danger-color: #EF4444;
-            --dark-color: #1F2937;
-            --gray-color: #6B7280;
-            --light-color: #E5E7EB;
-            --white-color: #FFFFFF;
-        }
-        
-        body {
-            font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .background-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNNTQuNjI3IDAgTDYwIDUuMzczIEw2MCA2MCBMMCAxNS4zNzMgTDAgMCBMNTQuNjI3IDAgWiIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjxwYXRoIGQ9Ik01NC42MjcgMCBMNS4zNzMgMCBMMCA1LjM3MyBMNjAgNjAgTDYwIDUuMzczIEw1NC42MjcgMCBaIiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
-            background-size: 60px 60px;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        
-        /* Login styling */
-        .login-container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 2rem;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            overflow: hidden;
-            display: flex;
-            z-index: 1;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .brand-section {
-            flex: 1;
-            padding: 3rem;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .brand-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNNTQuNjI3IDAgTDYwIDUuMzczIEw2MCA2MCBMMCAxNS4zNzMgTDAgMCBMNTQuNjI3IDAgWiIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PHBhdGggZD0iTTU0LjYyNyAwIEw1LjM3MyAwIEwwIDUuMzczIEw2MCA2MCBMNjAgNS4zNzMgTDU0LjYyNyAwIFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvc3ZnPg==');
-            background-size: 60px 60px;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .brand-subtitle {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .feature-list {
-            list-style: none;
-            margin-top: 2rem;
-            position: relative;
-            z-index: 1;
-            padding: 0;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            font-size: 1.125rem;
-        }
-        
-        .feature-item:before {
-            content: "✓";
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 24px;
-            height: 24px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            margin-right: 1rem;
-            font-size: 0.875rem;
-        }
-        
-        .form-section {
-            flex: 1;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .form-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--dark-color);
-        }
-        
-        .form-subtitle {
-            font-size: 1rem;
-            color: var(--gray-color);
-            margin-bottom: 2rem;
-        }
-        
-        .login-form {
-            width: 100%;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-color);
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            border: 1px solid var(--light-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            width: 100%;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .form-links {
-            margin-top: 1.5rem;
-            text-align: center;
-        }
-        
-        .form-links a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-        
-        .form-links a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Dashboard styling */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .sidebar {
-            width: 280px;
-            background-color: var(--dark-color);
-            color: white;
-            padding: 1.5rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
-        }
-        
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .sidebar-logo {
-            max-width: 40px;
-            margin-right: 1rem;
-        }
-        
-        .sidebar-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: #E5E7EB;
-            text-decoration: none;
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link i {
-            margin-right: 1rem;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .nav-link.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        /* Alert styling */
-        #alert-container {
-            margin-bottom: 1.5rem;
-        }
-        
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-        
-        .alert-success {
-            background-color: #D1FAE5;
-            color: #065F46;
-            border: 1px solid #A7F3D0;
-        }
-        
-        .alert-danger {
-            background-color: #FEE2E2;
-            color: #B91C1C;
-            border: 1px solid #FECACA;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-                max-width: 500px;
-            }
-            
-            .brand-section {
-                padding: 2rem;
-            }
-            
-            .form-section {
-                padding: 2rem;
-            }
-        }
-    </style>
     <!-- Add axios for API calls -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
@@ -373,8 +35,8 @@
             
             <div id="alert-container"></div>
             
-            <!-- Client-side form handling -->
-            <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+            <!-- Client-side form handling - NO action or method attributes to prevent default submission -->
+            <form id="login-form" class="login-form">
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <div class="input-wrapper">
@@ -390,12 +52,12 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="login-button">
+                    <button type="button" id="login-button" class="btn btn-primary">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
                 </div>
                 <div class="form-links">
-                    <a href="#" onclick="showForgotPassword(event)">Forgot Password?</a>
+                    <a href="#" id="forgot-password-link">Forgot Password?</a>
                 </div>
             </form>
         </div>
@@ -408,9 +70,6 @@
             <div class="sidebar-header">
                 <img src="https://via.placeholder.com/40x40?text=B" alt="Bridgetunes Logo" class="sidebar-logo">
                 <h2>Bridgetunes</h2>
-                <button id="sidebar-toggle" class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
             <div class="sidebar-user">
                 <div class="user-avatar" id="user-avatar">A</div>
@@ -422,43 +81,43 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li>
-                        <a href="#" class="nav-link active" data-page="dashboard">
+                        <a href="#dashboard" class="nav-link active" data-page="dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="notification">
+                        <a href="#notification" class="nav-link" data-page="notification">
                             <i class="fas fa-bell"></i>
                             <span>Notification Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="draw">
+                        <a href="#draw" class="nav-link" data-page="draw">
                             <i class="fas fa-random"></i>
                             <span>Draw Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="user">
+                        <a href="#user" class="nav-link" data-page="user">
                             <i class="fas fa-users"></i>
                             <span>User Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="transaction">
+                        <a href="#transaction" class="nav-link" data-page="transaction">
                             <i class="fas fa-exchange-alt"></i>
                             <span>Transaction Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="report">
+                        <a href="#report" class="nav-link" data-page="report">
                             <i class="fas fa-chart-bar"></i>
                             <span>Reports</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link" data-page="setting">
+                        <a href="#setting" class="nav-link" data-page="setting">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
                         </a>
@@ -482,5 +141,223 @@
                 </div>
                 <div class="dashboard-stats">
                     <div class="stat-card">
-                        <div class="stat-ic
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">5,432</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">12,345</div>
+                            <div class="stat-label">Total Topups</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">₦5,000,000</div>
+                            <div class="stat-label">Current Jackpot</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">3,456</div>
+                            <div class="stat-label">Notifications Sent</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2>User Growth</h2>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line"></i>
+                                <span>User Growth Chart</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2>Top-up Distribution</h2>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Top-up Distribution Chart</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="recent-activity">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>John Doe</td>
+                                        <td>Top-up ₦500</td>
+                                        <td>2 hours ago</td>
+                                        <td><span class="status-badge status-active">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jane Smith</td>
+                                        <td>Opt-in to promotion</td>
+                                        <td>3 hours ago</td>
+                                        <td><span class="status-badge status-active">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Michael Johnson</td>
+                                        <td>Top-up ₦1,000</td>
+                                        <td>5 hours ago</td>
+                                        <td><span class="status-badge status-active">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sarah Williams</td>
+                                        <td>Top-up ₦200</td>
+                                        <td>6 hours ago</td>
+                                        <td><span class="status-badge status-active">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Other content sections will be added here -->
+            <div id="notification-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Notification Management</h1>
+                </div>
+                <!-- Notification content will be added here -->
+            </div>
+            
+            <div id="draw-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Draw Management</h1>
+                </div>
+                <!-- Draw content will be added here -->
+            </div>
+            
+            <div id="user-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>User Management</h1>
+                </div>
+                <!-- User content will be added here -->
+            </div>
+            
+            <div id="transaction-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Transaction Management</h1>
+                </div>
+                <!-- Transaction content will be added here -->
+            </div>
+            
+            <div id="report-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Reports</h1>
+                </div>
+                <!-- Report content will be added here -->
+            </div>
+            
+            <div id="setting-content" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <!-- Settings content will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add script references -->
+    <script src="js/admin-auth.js"></script>
+    
+    <!-- Secure Authentication Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the authentication system
+            initializeAuth();
+            
+            // Check URL hash for navigation
+            handleHashChange();
+            
+            // Add event listener for hash changes
+            window.addEventListener('hashchange', handleHashChange);
+        });
+        
+        // Initialize authentication system
+        function initializeAuth() {
+            // Add event listener for login button
+            const loginButton = document.getElementById('login-button');
+            if (loginButton) {
+                loginButton.addEventListener('click', handleLogin);
+            }
+            
+            // Add event listener for login form submission (prevent default)
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Prevent form submission
+                    handleLogin(e);
+                });
+            }
+            
+            // Add event listener for forgot password link
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showForgotPassword();
+                });
+            }
+            
+            // Add event listener for logout button
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function() {
+                    logout();
+                });
+            }
+            
+            // Add event listeners for navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    window.location.hash = page;
+                });
+            });
+            
+            // Check if user is already logged in
+            checkAuthStatus();
+        }
+        
+        // Handle hash change for navigation
+        function handleHashChange() {
+            const hash = window.location.hash.replace(
 (Content truncated due to size limit. Use line ranges to read in chunks)

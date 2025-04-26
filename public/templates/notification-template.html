@@ -1,0 +1,216 @@
+<!-- Notification Management Template -->
+<div class="notification-management-container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Notification Campaigns</h5>
+                    <button class="btn btn-primary mb-3" id="create-campaign-btn">
+                        <i class="fas fa-plus"></i> Create New Campaign
+                    </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Status</th>
+                                    <th>Target Audience</th>
+                                    <th>Schedule</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaigns-table">
+                                <tr>
+                                    <td>Welcome Campaign</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>New Users</td>
+                                    <td>Immediate</td>
+                                    <td>2025-04-01</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Draw Reminder</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>All Users</td>
+                                    <td>Daily at 9:00 AM</td>
+                                    <td>2025-04-05</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jackpot Update</td>
+                                    <td><span class="badge bg-warning">Scheduled</span></td>
+                                    <td>Active Users</td>
+                                    <td>Weekly on Saturday</td>
+                                    <td>2025-04-10</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Notification Templates</h5>
+                    <button class="btn btn-primary mb-3" id="create-template-btn">
+                        <i class="fas fa-plus"></i> Create New Template
+                    </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Template Name</th>
+                                    <th>Type</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="templates-table">
+                                <tr>
+                                    <td>Welcome Message</td>
+                                    <td>SMS</td>
+                                    <td>2025-04-01</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Draw Reminder</td>
+                                    <td>SMS</td>
+                                    <td>2025-04-05</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Winner Notification</td>
+                                    <td>SMS</td>
+                                    <td>2025-04-10</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Segments</h5>
+                    <button class="btn btn-primary mb-3" id="create-segment-btn">
+                        <i class="fas fa-plus"></i> Create New Segment
+                    </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Segment Name</th>
+                                    <th>Users Count</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="segments-table">
+                                <tr>
+                                    <td>New Users</td>
+                                    <td>1,245</td>
+                                    <td>2025-04-01</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Active Users</td>
+                                    <td>5,678</td>
+                                    <td>2025-04-05</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Inactive Users</td>
+                                    <td>2,345</td>
+                                    <td>2025-04-10</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Notification Logs</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Campaign</th>
+                                    <th>Recipient</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notification-logs-table">
+                                <tr>
+                                    <td>2025-04-26 09:15:23</td>
+                                    <td>Welcome Campaign</td>
+                                    <td>+2348012345678</td>
+                                    <td>Welcome to Bridgetunes! Your number is now registered...</td>
+                                    <td><span class="badge bg-success">Delivered</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-04-26 09:14:56</td>
+                                    <td>Draw Reminder</td>
+                                    <td>+2348023456789</td>
+                                    <td>Don't miss today's draw at 4PM! Top up now to qualify...</td>
+                                    <td><span class="badge bg-success">Delivered</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-04-26 09:14:32</td>
+                                    <td>Jackpot Update</td>
+                                    <td>+2348034567890</td>
+                                    <td>This week's jackpot is now ₦3,000,000! Top up to qualify...</td>
+                                    <td><span class="badge bg-danger">Failed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

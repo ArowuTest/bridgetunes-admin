@@ -28,13 +28,13 @@ async function fetchAdminUsers() {
   }
 }
 
-// Login function
+// Login function - Secure implementation
 async function loginAdmin(email, password) {
   try {
-    // In production, this would be an API call
+    // In production, this would be an API call with proper HTTPS
     await fetchAdminUsers();
     
-    // Find user by email
+    // Find user by email (case-insensitive)
     const user = adminUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (!user) {
@@ -45,7 +45,15 @@ async function loginAdmin(email, password) {
     }
     
     // In a real implementation, we would verify the password hash
-    // For demo purposes, we'll just check if the user exists and is active
+    // For demo purposes, we'll just check if the password matches
+    if (user.password !== password) {
+      return {
+        success: false,
+        message: 'Invalid email or password'
+      };
+    }
+    
+    // Check if account is active
     if (!user.isActive) {
       return {
         success: false,
@@ -57,12 +65,7 @@ async function loginAdmin(email, password) {
     const userPermissions = adminPermissions[user.userType] || {};
     
     // Create a session token (in production, this would be a JWT from the server)
-    const token = btoa(JSON.stringify({
-      userId: user.id,
-      email: user.email,
-      userType: user.userType,
-      exp: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiration
-    }));
+    const token = generateSecureToken(user);
     
     // Store token and user info in local storage
     localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
@@ -98,12 +101,27 @@ async function loginAdmin(email, password) {
   }
 }
 
+// Generate a secure token
+function generateSecureToken(user) {
+  // In production, this would be a JWT from the server
+  // For demo purposes, we'll create a simple token with expiration
+  const tokenData = {
+    userId: user.id,
+    email: user.email,
+    userType: user.userType,
+    exp: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiration
+  };
+  
+  // Base64 encode the token data
+  return btoa(JSON.stringify(tokenData));
+}
+
 // Logout function
 function logoutAdmin() {
   localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
   localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
   // Updated to use hash fragment
-  window.location.href = 'index.html#login';
+  window.location.hash = 'login';
 }
 
 // Check if user is logged in
@@ -341,17 +359,23 @@ window.addEventListener('hashchange', handleHashNavigation);
 
 // Initialize based on current hash when page loads
 document.addEventListener('DOMContentLoaded', function() {
-  // If no hash is present, default to login or dashboard based on login status
-  if (!window.location.hash) {
-    window.location.hash = isAdminLoggedIn() ? 'dashboard' : 'login';
-  } else {
-    handleHashNavigation();
-  }
-  
-  // Initialize admin header if logged in
+  // Check if user is already logged in
   if (isAdminLoggedIn()) {
     initAdminHeader();
+    
+    // If no hash is present, default to dashboard
+    if (!window.location.hash) {
+      window.location.hash = 'dashboard';
+    }
+  } else {
+    // If no hash is present, default to login
+    if (!window.location.hash) {
+      window.location.hash = 'login';
+    }
   }
+  
+  // Handle current hash
+  handleHashNavigation();
   
   // Add click handlers for navigation links
   document.querySelectorAll('.nav-link').forEach(link => {

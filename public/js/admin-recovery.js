@@ -52,7 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Redirect after showing message
             setTimeout(function() {
-              window.location.href = 'draw-engine.html';
+              // Show dashboard in the current page instead of redirecting
+              document.getElementById('login-page').style.display = 'none';
+              document.getElementById('dashboard-page').style.display = 'flex';
             }, 2000);
             return;
           }
@@ -60,8 +62,17 @@ document.addEventListener('DOMContentLoaded', function() {
           // If both normal login and emergency recovery fail
           showAlert('Invalid email or password. Please try again or use the forgot password link.', 'danger');
         } else {
-          // Normal login successful
-          window.location.href = 'draw-engine.html';
+          // Normal login successful - show dashboard in current page
+          document.getElementById('login-page').style.display = 'none';
+          document.getElementById('dashboard-page').style.display = 'flex';
+          
+          // Update user info in the dashboard
+          const user = getCurrentAdmin();
+          if (user) {
+            document.getElementById('admin-username').textContent = user.username || 'Admin User';
+            document.getElementById('admin-user-type').textContent = user.userType || 'Admin';
+            document.getElementById('user-avatar').textContent = (user.username || 'A').charAt(0);
+          }
         }
       } catch (error) {
         console.error('Login error:', error);

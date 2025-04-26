@@ -344,6 +344,9 @@
             }
         }
     </style>
+    <!-- Add axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 </head>
 <body>
     <div class="background-pattern"></div>
@@ -370,8 +373,8 @@
             
             <div id="alert-container"></div>
             
-            <!-- Changed form method to POST to prevent credentials in URL -->
-            <form id="login-form" class="login-form" method="POST" onsubmit="handleLogin(event)">
+            <!-- Client-side form handling -->
+            <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <div class="input-wrapper">
@@ -387,7 +390,7 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="login-button">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
                 </div>
@@ -479,9 +482,5 @@
                 </div>
                 <div class="dashboard-stats">
                     <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="s
+                        <div class="stat-ic
 (Content truncated due to size limit. Use line ranges to read in chunks)

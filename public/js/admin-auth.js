@@ -222,7 +222,13 @@ async function createAdminUser(userData) {
 // Protect admin pages
 function protectAdminPage() {
   if (!isAdminLoggedIn()) {
-    window.location.href = 'index.html';
+    // If we're already on index.html, show the login page
+    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+      document.getElementById('dashboard-page').style.display = 'none';
+      document.getElementById('login-page').style.display = 'flex';
+    } else {
+      window.location.href = 'index.html';
+    }
     return false;
   }
   return true;
@@ -270,3 +276,4 @@ function initAdminHeader() {
     }
   });
 }
+

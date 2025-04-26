@@ -294,70 +294,13 @@
     </div>
 
     <!-- Add script references -->
-    <script src="js/admin-auth.js"></script>
-    
-    <!-- Secure Authentication Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the authentication system
-            initializeAuth();
-            
-            // Check URL hash for navigation
-            handleHashChange();
-            
-            // Add event listener for hash changes
-            window.addEventListener('hashchange', handleHashChange);
-        });
-        
-        // Initialize authentication system
-        function initializeAuth() {
-            // Add event listener for login button
-            const loginButton = document.getElementById('login-button');
-            if (loginButton) {
-                loginButton.addEventListener('click', handleLogin);
-            }
-            
-            // Add event listener for login form submission (prevent default)
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Prevent form submission
-                    handleLogin(e);
-                });
-            }
-            
-            // Add event listener for forgot password link
-            const forgotPasswordLink = document.getElementById('forgot-password-link');
-            if (forgotPasswordLink) {
-                forgotPasswordLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showForgotPassword();
-                });
-            }
-            
-            // Add event listener for logout button
-            const logoutButton = document.getElementById('logout-button');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', function() {
-                    logout();
-                });
-            }
-            
-            // Add event listeners for navigation links
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    window.location.hash = page;
-                });
-            });
-            
-            // Check if user is already logged in
-            checkAuthStatus();
-        }
-        
-        // Handle hash change for navigation
-        function handleHashChange() {
-            const hash = window.location.hash.replace(
-(Content truncated due to size limit. Use line ranges to read in chunks)
+    <script src="js/admin-portal.js"></script>
+    <script src="js/mongodb-service.js"></script>
+    <script src="js/notification-management-service.js"></script>
+    <script src="js/draw-management-service.js"></script>
+    <script src="js/user-management-service.js"></script>
+    <script src="js/csv-upload-service.js"></script>
+    <script src="js/admin-portal-integration.js"></script>
+</body>
+</html>
+

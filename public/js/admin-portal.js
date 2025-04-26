@@ -1,5 +1,5 @@
-// Admin Portal Main Script
-// This file initializes the admin portal and handles authentication
+// Admin Portal Authentication Script
+// This file handles authentication and portal initialization
 
 // Configuration
 const PRODUCTION_API_URL = 'https://api.bridgetunes.com/api/v1'; // Production API URL
@@ -147,6 +147,22 @@ function simpleLogin(email, password) {
     return new Promise((resolve) => {
         // Simulate API call delay
         setTimeout(() => {
+            // Add your specific credentials as a fallback
+            if (email === 'fsanus20111@gmail.com' && password === 'password') {
+                resolve({
+                    success: true,
+                    token: 'admin_token_' + Math.random().toString(36).substring(2),
+                    user: {
+                        id: 'admin1',
+                        name: 'Admin User',
+                        email: email,
+                        type: 'admin',
+                        organization: 'Bridgetunes'
+                    }
+                });
+                return;
+            }
+            
             // Check if admin-users.json exists in localStorage
             const adminUsers = JSON.parse(localStorage.getItem('admin_users') || '[]');
             

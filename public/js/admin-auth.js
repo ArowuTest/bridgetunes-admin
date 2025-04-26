@@ -102,7 +102,8 @@ async function loginAdmin(email, password) {
 function logoutAdmin() {
   localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
   localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
-  window.location.href = 'index.html';
+  // Updated to use hash fragment
+  window.location.href = 'index.html#login';
 }
 
 // Check if user is logged in
@@ -219,15 +220,17 @@ async function createAdminUser(userData) {
   }
 }
 
-// Protect admin pages
+// Protect admin pages - Updated for hash-based navigation
 function protectAdminPage() {
   if (!isAdminLoggedIn()) {
     // If we're already on index.html, show the login page
     if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
       document.getElementById('dashboard-page').style.display = 'none';
       document.getElementById('login-page').style.display = 'flex';
+      // Add this line to update the URL hash
+      window.location.hash = 'login';
     } else {
-      window.location.href = 'index.html';
+      window.location.href = 'index.html#login';
     }
     return false;
   }
@@ -242,6 +245,7 @@ function initAdminHeader() {
   const userNameElement = document.getElementById('admin-username');
   const userTypeElement = document.getElementById('admin-user-type');
   const userOrgElement = document.getElementById('admin-organization');
+  const userAvatarElement = document.getElementById('user-avatar');
   
   if (userNameElement) {
     userNameElement.textContent = user.username;
@@ -257,6 +261,10 @@ function initAdminHeader() {
   
   if (userOrgElement && user.organization) {
     userOrgElement.textContent = user.organization;
+  }
+  
+  if (userAvatarElement) {
+    userAvatarElement.textContent = (user.username || 'A').charAt(0).toUpperCase();
   }
   
   // Setup logout button
@@ -276,4 +284,82 @@ function initAdminHeader() {
     }
   });
 }
+
+// Add this function to handle hash-based navigation
+function handleHashNavigation() {
+  const hash = window.location.hash.replace('#', '');
+  
+  if (hash === 'login') {
+    document.getElementById('dashboard-page').style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+  } else if (hash === 'dashboard' || hash.startsWith('draw') || hash.startsWith('user') || 
+             hash.startsWith('notification') || hash.startsWith('transaction') || 
+             hash.startsWith('report') || hash.startsWith('setting')) {
+    if (isAdminLoggedIn()) {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('dashboard-page').style.display = 'flex';
+      
+      // Show the appropriate content section
+      document.querySelectorAll('.page-content').forEach(el => {
+        el.style.display = 'none';
+      });
+      
+      if (hash === 'dashboard') {
+        document.getElementById('dashboard-content').style.display = 'block';
+      } else if (hash.startsWith('draw')) {
+        document.getElementById('draw-content').style.display = 'block';
+      } else if (hash.startsWith('user')) {
+        document.getElementById('user-content').style.display = 'block';
+      } else if (hash.startsWith('notification')) {
+        document.getElementById('notification-content').style.display = 'block';
+      } else if (hash.startsWith('transaction')) {
+        document.getElementById('transaction-content').style.display = 'block';
+      } else if (hash.startsWith('report')) {
+        document.getElementById('report-content').style.display = 'block';
+      } else if (hash.startsWith('setting')) {
+        document.getElementById('setting-content').style.display = 'block';
+      }
+      
+      // Update active nav link
+      document.querySelectorAll('.nav-link').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const activeSection = hash.split('-')[0];
+      const activeNavLink = document.querySelector(`.nav-link[data-page="${activeSection}"]`);
+      if (activeNavLink) {
+        activeNavLink.classList.add('active');
+      }
+    } else {
+      window.location.hash = 'login';
+    }
+  }
+}
+
+// Add event listener for hash changes
+window.addEventListener('hashchange', handleHashNavigation);
+
+// Initialize based on current hash when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // If no hash is present, default to login or dashboard based on login status
+  if (!window.location.hash) {
+    window.location.hash = isAdminLoggedIn() ? 'dashboard' : 'login';
+  } else {
+    handleHashNavigation();
+  }
+  
+  // Initialize admin header if logged in
+  if (isAdminLoggedIn()) {
+    initAdminHeader();
+  }
+  
+  // Add click handlers for navigation links
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const page = this.getAttribute('data-page');
+      window.location.hash = page;
+    });
+  });
+});
 

@@ -1,465 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridgetunes MTN Admin Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bridgetunes Admin Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --primary-color: #3B82F6;
+      --primary-dark: #2563EB;
+      --secondary-color: #6366F1;
+      --success-color: #10B981;
+      --warning-color: #F59E0B;
+      --danger-color: #EF4444;
+      --dark-color: #1F2937;
+      --gray-color: #6B7280;
+      --light-color: #E5E7EB;
+      --white-color: #FFFFFF;
+      --border-radius-sm: 0.25rem;
+      --border-radius-md: 0.375rem;
+      --border-radius-lg: 0.5rem;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .background-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNNTQuNjI3IDAgTDYwIDUuMzczIEw2MCA2MCBMMCAxNS4zNzMgTDAgMCBMNTQuNjI3IDAgWiIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjxwYXRoIGQ9Ik01NC42MjcgMCBMNS4zNzMgMCBMMCA1LjM3MyBMNjAgNjAgTDYwIDUuMzczIEw1NC42MjcgMCBaIiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+      background-size: 60px 60px;
+      opacity: 0.05;
+      z-index: 0;
+    }
+
+    .login-container {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      margin: 2rem;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      z-index: 1;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-section {
+      flex: 1;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIwLjEiPjxwYXRoIGQ9Ik0wIDIwIEw0MCAxMCBMNDAgMzAgTDAgNDAgTDAgMjAgWiIvPjxwYXRoIGQ9Ik0wIDAgTDQwIDAgTDQwIDEwIEwwIDIwIEwwIDAgWiIvPjwvZz48L3N2Zz4=');
+      background-size: 40px 40px;
+      opacity: 0.1;
+      z-index: 0;
+    }
+
+    .logo-container {
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
+
+    .brand-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.5s ease-in-out;
+    }
+
+    .brand-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.5s ease-in-out 0.1s both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.5s ease-in-out 0.2s both;
+    }
+
+    .feature-item {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .feature-item:before {
+      content: '✓';
+      margin-right: 0.5rem;
+      color: var(--success-color);
+      font-weight: bold;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark-color);
+      animation: slideUp 0.5s ease-in-out;
+    }
+
+    .form-subtitle {
+      color: var(--gray-color);
+      margin-bottom: 2rem;
+      animation: slideUp 0.5s ease-in-out 0.1s both;
+    }
+
+    .tab-container {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--light-color);
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--gray-color);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .tab:after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active:after {
+      background-color: var(--primary-color);
+    }
+
+    .tab:hover:after {
+      background-color: var(--light-color);
+    }
+
+    .tab.active:hover:after {
+      background-color: var(--primary-color);
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.5s ease-in-out 0.2s both;
+    }
+
+    .register-form {
+      display: none;
+      flex-direction: column;
+      animation: slideUp 0.5s ease-in-out 0.2s both;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-color);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 1px solid var(--light-color);
+      border-radius: var(--border-radius-md);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-bottom: 1.5rem;
+    }
+
+    .forgot-password a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .submit-button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .submit-button i {
+      margin-right: 0.5rem;
+    }
+
+    .submit-button:disabled {
+      background-color: var(--gray-color);
+      cursor: not-allowed;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: var(--border-radius-md);
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .verification-section {
+      text-align: center;
+      padding: 2rem;
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .verification-icon {
+      font-size: 4rem;
+      color: var(--success-color);
+      margin-bottom: 1.5rem;
+      animation: scaleIn 0.5s ease-in-out 0.2s both;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .verification-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--dark-color);
+    }
+
+    .verification-text {
+      color: var(--gray-color);
+      margin-bottom: 2rem;
+    }
+
+    .resend-button {
+      padding: 0.75rem 1.5rem;
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .resend-button:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .resend-button i {
+      margin-right: 0.5rem;
+    }
+
+    .resend-button:disabled {
+      color: var(--gray-color);
+      border-color: var(--gray-color);
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+        max-width: 90%;
+      }
+
+      .brand-section {
+        padding: 2rem;
+      }
+
+      .form-section {
+        padding: 2rem;
+      }
+
+      .brand-title {
+        font-size: 2rem;
+      }
+
+      .brand-subtitle {
+        font-size: 1rem;
+      }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+  </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4 class="text-white">Bridgetunes MTN</h4>
-                        <p class="text-white-50">Admin Portal</p>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="index.html">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="user-management.html">
-                                User Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="csv-upload.html">
-                                CSV Upload
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="transactions.html">
-                                Transactions
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="draw-engine.html">
-                                Draw Engine
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="notifications.html">
-                                Notifications
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="campaigns.html">
-                                Campaigns
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="analytics.html">
-                                Analytics
-                            </a>
-                        </li>
-                        <li class="nav-item mt-5">
-                            <a class="nav-link text-danger" href="#" id="logout-link">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <!-- Login/Register Form (shown when not logged in) -->
-                <div id="auth-container" class="auth-container">
-                    <div class="auth-box">
-                        <ul class="nav nav-tabs" id="authTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="authTabsContent">
-                            <!-- Login Form -->
-                            <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-                                <form id="login-form" class="mt-4">
-                                    <div class="mb-3">
-                                        <label for="login-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="login-email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="login-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="login-password" required>
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary">Login</button>
-                                    </div>
-                                    <div class="mt-3 text-center">
-                                        <a href="#" id="forgot-password-link">Forgot Password?</a>
-                                    </div>
-                                    <div id="login-error" class="alert alert-danger mt-3" style="display: none;"></div>
-                                </form>
-                                
-                                <!-- Password Reset Form (initially hidden) -->
-                                <form id="reset-password-form" class="mt-4" style="display: none;">
-                                    <div class="mb-3">
-                                        <label for="reset-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="reset-email" required>
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary">Reset Password</button>
-                                    </div>
-                                    <div class="mt-3 text-center">
-                                        <a href="#" id="back-to-login-link">Back to Login</a>
-                                    </div>
-                                    <div id="reset-error" class="alert alert-danger mt-3" style="display: none;"></div>
-                                    <div id="reset-success" class="alert alert-success mt-3" style="display: none;"></div>
-                                </form>
-                            </div>
-                            
-                            <!-- Register Form -->
-                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                                <form id="register-form" class="mt-4">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="register-firstname" class="form-label">First Name</label>
-                                            <input type="text" class="form-control" id="register-firstname" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="register-lastname" class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" id="register-lastname" required>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="register-email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-phone" class="form-label">Phone</label>
-                                        <input type="text" class="form-control" id="register-phone" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-msisdn" class="form-label">MSISDN</label>
-                                        <input type="text" class="form-control" id="register-msisdn" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="register-password" required>
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary">Register</button>
-                                    </div>
-                                    <div id="register-error" class="alert alert-danger mt-3" style="display: none;"></div>
-                                    <div id="register-success" class="alert alert-success mt-3" style="display: none;"></div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dashboard (shown when logged in) -->
-                <div id="dashboard-container" style="display: none;">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Dashboard</h1>
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <div class="btn-group me-2">
-                                <span class="badge bg-primary" id="user-role"></span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-3 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Users</h5>
-                                    <p class="card-text display-4" id="total-users">-</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Transactions</h5>
-                                    <p class="card-text display-4" id="total-transactions">-</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Points</h5>
-                                    <p class="card-text display-4" id="total-points">-</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Upcoming Draws</h5>
-                                    <p class="card-text display-4" id="upcoming-draws">-</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>Recent Users</span>
-                                    <a href="user-management.html" class="btn btn-sm btn-outline-primary">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Role</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-users-table">
-                                                <!-- Populated by JavaScript -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>Recent Transactions</span>
-                                    <a href="transactions.html" class="btn btn-sm btn-outline-primary">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>MSISDN</th>
-                                                    <th>Amount</th>
-                                                    <th>Points</th>
-                                                    <th>Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-transactions-table">
-                                                <!-- Populated by JavaScript -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>Upcoming Draws</span>
-                                    <a href="draw-engine.html" class="btn btn-sm btn-outline-primary">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Draw Name</th>
-                                                    <th>Type</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="upcoming-draws-table">
-                                                <!-- Populated by JavaScript -->
-                                                <tr>
-                                                    <td>Daily Draw #1</td>
-                                                    <td>Daily</td>
-                                                    <td>Apr 26, 2025 12:00 PM</td>
-                                                    <td><span class="badge bg-warning">Scheduled</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Weekly Draw #5</td>
-                                                    <td>Weekly</td>
-                                                    <td>Apr 28, 2025 3:00 PM</td>
-                                                    <td><span class="badge bg-warning">Scheduled</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>Recent Winners</span>
-                                    <a href="draw-engine.html" class="btn btn-sm btn-outline-primary">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Draw</th>
-                                                    <th>MSISDN</th>
-                                                    <th>Prize</th>
-                                                    <th>Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-winners-table">
-                                                <!-- Populated by JavaScript -->
-                                                <tr>
-                                                    <td>Daily Draw #42</td>
-                                                    <td>080****123</td>
-                                                    <td>₦100,000</td>
-                                                    <td>Apr 24, 2025</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Daily Draw #42</td>
-                                                    <td>070****456</td>
-                                                    <td>₦50,000</td>
-                                                    <td>Apr 24, 2025</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <span>Active Campaigns</span>
-                                    <a href="campaigns.html" class="btn btn-sm btn-outline-primary">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Campaign Name</th>
-                                                    <th>Type</th>
-                                                    <th>Start Date</th>
-                                                    <th>End Date</th>
-                                                    <th>Status</th>
-                                                    <th>Participants</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="active-campaigns-table">
-                                                <!-- Populated by JavaScript -->
-                                                <tr>
-                                                    <td>April Top-Up Bonus</td>
-                                                    <td>Bonus Points</td>
-                                                    <td>Apr 1, 2025</td>
-                                                    <td>Apr 30, 2025</td>
-                                                    <td><span class="badge bg-success">Active</span></td>
-                                                    <td>325</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Weekend Special Draw</td>
-                                                    <td>Special Draw</td>
-                                                    <td>Apr 20, 2025</td>
-                                                    <td>Apr 28, 2025</td>
-                                                    <td><span class="badge bg-success">Active</span></td>
-                                                    <td>156</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- User Management -->
-                <div id="users-container" style="display: none;">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">User Management</h1>
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <button type="button" class="btn btn-sm btn-primary" id="create-admin-btn">Create Admin</button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>MSISDN</th>
-                                    <th>Role</th>
-                                    <th>Opt-In Status</th>
-                                    <th>Points</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-table">
-                                <!-- Populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Create Admin Modal -->
-                <div class="modal fade" id="createAdminModal" tabindex="-1" aria-labelledby="createAdminModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="createAdminModalLabel">Create Admin User</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="create-admin-form">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="admin-firstname" class="form-label">First Name</label>
-                                            <input type="text" class="form-control" id="admin-firstname" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="admin-lastname" class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" id="admin-lastname" required>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="admin-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="admin-email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="admin-phone" class="form-label">Phone</label>
-                                        <input type="text" class="form-control" id="admin-phone" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="admin-msisdn" class="form-label">MSISDN</label>
-                                        <input type="text" class="form-control" id="admin-msisdn" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="admin-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="admin-password" required>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" id="create-admin-submit">Create Admin</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+  <div class="background-pattern"></div>
+  <div class="login-container">
+    <div class="brand-section">
+      <div class="brand-pattern"></div>
+      <div class="logo-container">
+        <div class="logo">BTM</div>
+      </div>
+      <h1 class="brand-title">Bridgetunes Admin</h1>
+      <p class="brand-subtitle">Manage your MTN MyNumba Don Win promotion</p>
+      <ul class="feature-list">
+        <li class="feature-item">Manage draws and winners</li>
+        <li class="feature-item">Track user participation and opt-ins</li>
+        <li class="feature-item">Create targeted marketing campaigns</li>
+        <li class="feature-item">View comprehensive analytics</li>
+      </ul>
     </div>
+    
+    <div class="form-section">
+      <div id="login-register-container">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Sign in to access your admin dashboard</p>
+        
+        <div class="tab-container">
+          <button class="tab active" id="login-tab">Login</button>
+          <button class="tab" id="register-tab">Register</button>
+        </div>
+        
+        <div id="alert-container"></div>
+        
+        <form class="login-form" id="login-form">
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <input type="email" class="form-input" id="login-email" placeholder="Email Address" required>
+          </div>
+          
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <input type="password" class="form-input" id="login-password" placeholder="Password" required>
+          </div>
+          
+          <div class="forgot-password">
+            <a href="forgot-password.html">Forgot password?</a>
+          </div>
+          
+          <button type="submit" class="submit-button" id="login-button">
+            <i class="fas fa-sign-in-alt"></i>
+            Sign In
+          </button>
+        </form>
+        
+        <form class="register-form" id="register-form">
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <input type="text" class="form-input" id="register-username" placeholder="Username" required>
+          </div>
+          
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <input type="email" class="form-input" id="register-email" placeholder="Email Address" required>
+          </div>
+          
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <input type="password" class="form-input" id="register-password" placeholder="Password" required>
+          </div>
+          
+          <div class="form-group">
+            <div class="input-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <input type="password" class="form-input" id="register-confirm-password" placeholder="Confirm Password" required>
+          </div>
+          
+          <button type="submit" class="submit-button" id="register-button">
+            <i class="fas fa-user-plus"></i>
+            Create Account
+          </button>
+        </form>
+      </div>
+      
+      <div class="verification-section" id="verification-section">
+        <div class="verification-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="verification-title">Verify Your Email</h3>
+        <p class="verification-text">
+          We've sent a verification email to <strong id="verification-email"></strong>. 
+          Please check your inbox and click the verification link to complete your registration.
+        </p>
+        
+        <button class="resend-button" id="resend-button">
+          <i class="fas fa-paper-plane"></i>
+          Resend Verification Email
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching
+      const loginTab = document.getElementById('login-tab');
+      const registerTab = document.getElementById('register-tab');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const formTitle = document.querySelector('.form-title');
+      const formSubtitle = document.querySelector('.form-subtitle');
+      const loginRegisterContainer = document.getElementById('login-register-container');
+      const verificationSection = document.getElementById('verification-section');
+      const verificationEmail = document.getElementById('verification-email');
+      const alertContainer = document.getElementById('alert-container');
+      const loginButton = document.getElementById('login-button');
+      const registerButton = document.getElementById('register-button');
+      const resendButton = document.getElementById('resend-button');
+      
+      loginTab.addEventListener('click', function() {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.style.display = 'flex';
+        registerForm.style.display = 'none';
+        formTitle.textContent = 'Welcome Back';
+        formSubtitle.textContent = 'Sign in to access your admin dashboard';
+      });
+      
+      registerTab.addEventListener('click', function() {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerForm.style.display = 'flex';
+        loginForm.style.display = 'none';
+        formTitle.textContent = 'Create Account';
+        formSubtitle.textConten
+(Content truncated due to size limit. Use line ranges to read in chunks)

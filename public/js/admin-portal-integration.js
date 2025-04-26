@@ -1,19 +1,26 @@
 // Admin Portal Integration
-// This file integrates all components of the admin portal with the backend
+// This file connects all components to the backend API
 
 // Configuration
 const PRODUCTION_API_URL = 'https://api.bridgetunes.com/api/v1'; // Production API URL
 const DEVELOPMENT_API_URL = 'http://localhost:8080/api/v1'; // Development API URL
 const API_URL = window.location.hostname === 'localhost' ? DEVELOPMENT_API_URL : PRODUCTION_API_URL;
 
+// Initialize admin portal
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing Admin Portal Integration...');
+    
+    // Check if user is authenticated
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        console.log('User is authenticated, initializing components...');
+        initializeAdminPortal();
+    }
+});
+
 // Initialize admin portal components
 function initializeAdminPortal() {
     console.log('Initializing Admin Portal Components...');
-    
-    // Initialize MongoDB service
-    if (typeof initializeMongoDBService === 'function') {
-        initializeMongoDBService(API_URL);
-    }
     
     // Initialize notification management
     initializeNotificationManagement();
@@ -38,41 +45,21 @@ function initializeAdminPortal() {
 function initializeNotificationManagement() {
     console.log('Initializing Notification Management...');
     
-    // Get notification content container
-    const notificationContent = document.getElementById('notification-content');
-    if (!notificationContent) return;
-    
     // Check if notification management service is available
     if (typeof NotificationManagementService !== 'undefined') {
         // Initialize notification management service
         const notificationService = new NotificationManagementService(API_URL);
         
         // Load notification templates
-        notificationService.loadTemplates()
-            .then(templates => {
-                console.log('Notification Templates Loaded:', templates);
-            })
-            .catch(error => {
-                console.error('Error loading notification templates:', error);
-            });
+        notificationService.loadTemplates();
         
         // Load user segments
-        notificationService.loadUserSegments()
-            .then(segments => {
-                console.log('User Segments Loaded:', segments);
-            })
-            .catch(error => {
-                console.error('Error loading user segments:', error);
-            });
+        notificationService.loadUserSegments();
         
         // Load campaigns
-        notificationService.loadCampaigns()
-            .then(campaigns => {
-                console.log('Campaigns Loaded:', campaigns);
-            })
-            .catch(error => {
-                console.error('Error loading campaigns:', error);
-            });
+        notificationService.loadCampaigns();
+    } else {
+        console.warn('NotificationManagementService not found, skipping initialization.');
     }
 }
 
@@ -80,32 +67,18 @@ function initializeNotificationManagement() {
 function initializeDrawManagement() {
     console.log('Initializing Draw Management...');
     
-    // Get draw content container
-    const drawContent = document.getElementById('draw-content');
-    if (!drawContent) return;
-    
     // Check if draw management service is available
     if (typeof DrawManagementService !== 'undefined') {
         // Initialize draw management service
         const drawService = new DrawManagementService(API_URL);
         
         // Load draw history
-        drawService.loadDrawHistory()
-            .then(history => {
-                console.log('Draw History Loaded:', history);
-            })
-            .catch(error => {
-                console.error('Error loading draw history:', error);
-            });
+        drawService.loadDrawHistory();
         
-        // Load jackpot information
-        drawService.loadJackpotInfo()
-            .then(jackpot => {
-                console.log('Jackpot Info Loaded:', jackpot);
-            })
-            .catch(error => {
-                console.error('Error loading jackpot info:', error);
-            });
+        // Load jackpot configuration
+        drawService.loadJackpotConfiguration();
+    } else {
+        console.warn('DrawManagementService not found, skipping initialization.');
     }
 }
 
@@ -113,23 +86,15 @@ function initializeDrawManagement() {
 function initializeUserManagement() {
     console.log('Initializing User Management...');
     
-    // Get user content container
-    const userContent = document.getElementById('user-content');
-    if (!userContent) return;
-    
     // Check if user management service is available
     if (typeof UserManagementService !== 'undefined') {
         // Initialize user management service
         const userService = new UserManagementService(API_URL);
         
         // Load users
-        userService.loadUsers()
-            .then(users => {
-                console.log('Users Loaded:', users);
-            })
-            .catch(error => {
-                console.error('Error loading users:', error);
-            });
+        userService.loadUsers();
+    } else {
+        console.warn('UserManagementService not found, skipping initialization.');
     }
 }
 
@@ -141,6 +106,11 @@ function initializeCSVUpload() {
     if (typeof CSVUploadService !== 'undefined') {
         // Initialize CSV upload service
         const csvService = new CSVUploadService(API_URL);
+        
+        // Initialize file upload listeners
+        csvService.initializeFileUploadListeners();
+    } else {
+        console.warn('CSVUploadService not found, skipping initialization.');
     }
 }
 
@@ -148,119 +118,59 @@ function initializeCSVUpload() {
 function initializeAdminCreation() {
     console.log('Initializing Admin Creation...');
     
-    // Get settings content container
-    const settingContent = document.getElementById('setting-content');
-    if (!settingContent) return;
-    
-    // Create admin creation form if it doesn't exist
-    if (!document.getElementById('admin-creation-form')) {
-        // Create form container
-        const formContainer = document.createElement('div');
-        formContainer.className = 'card';
-        formContainer.innerHTML = `
-            <div class="card-header">
-                <h2 class="card-title">Create Admin User</h2>
-            </div>
-            <div class="card-body">
-                <form id="admin-creation-form" class="form">
-                    <div class="form-group">
-                        <label for="admin-name">Name</label>
-                        <input type="text" id="admin-name" name="name" class="form-control" placeholder="Enter name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-email">Email</label>
-                        <input type="email" id="admin-email" name="email" class="form-control" placeholder="Enter email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-password">Password</label>
-                        <input type="password" id="admin-password" name="password" class="form-control" placeholder="Enter password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-type">Type</label>
-                        <select id="admin-type" name="type" class="form-control" required>
-                            <option value="admin">Admin</option>
-                            <option value="staff">Staff</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="organization-group" style="display: none;">
-                        <label for="admin-organization">Organization</label>
-                        <select id="admin-organization" name="organization" class="form-control">
-                            <option value="Bridgetunes">Bridgetunes</option>
-                            <option value="MTN">MTN</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Create Admin</button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        // Add form to settings content
-        settingContent.appendChild(formContainer);
-        
-        // Add event listener for admin type change
-        const adminType = document.getElementById('admin-type');
-        const organizationGroup = document.getElementById('organization-group');
-        
-        if (adminType && organizationGroup) {
-            adminType.addEventListener('change', function() {
-                if (this.value === 'staff') {
-                    organizationGroup.style.display = 'block';
-                } else {
-                    organizationGroup.style.display = 'none';
-                }
-            });
-        }
-        
-        // Add event listener for form submission
-        const adminCreationForm = document.getElementById('admin-creation-form');
-        if (adminCreationForm) {
-            adminCreationForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form data
-                const name = document.getElementById('admin-name').value;
-                const email = document.getElementById('admin-email').value;
-                const password = document.getElementById('admin-password').value;
-                const type = document.getElementById('admin-type').value;
-                const organization = type === 'staff' ? document.getElementById('admin-organization').value : '';
-                
-                // Create admin user
-                createAdminUser(name, email, password, type, organization);
-            });
-        }
+    // Add event listener for admin creation form
+    const adminCreationForm = document.getElementById('admin-creation-form');
+    if (adminCreationForm) {
+        adminCreationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const name = document.getElementById('admin-name').value;
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const type = document.getElementById('admin-type').value;
+            const organization = document.getElementById('admin-organization')?.value || 'Bridgetunes';
+            
+            // Validate input
+            if (!name || !email || !password || !type) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Create admin user
+            createAdminUser(name, email, password, type, organization);
+        });
     }
 }
 
 // Create admin user
 function createAdminUser(name, email, password, type, organization) {
-    console.log('Creating Admin User:', { name, email, type, organization });
+    console.log('Creating Admin User:', name, email, type, organization);
     
-    // Get admin users from localStorage
+    // Get existing admin users
     const adminUsers = JSON.parse(localStorage.getItem('admin_users') || '[]');
     
     // Check if email already exists
-    if (adminUsers.some(user => user.email === email)) {
-        alert('Email already exists. Please use a different email.');
+    if (adminUsers.find(user => user.email === email)) {
+        alert('Email already exists.');
         return;
     }
     
     // Create new admin user
     const newUser = {
-        id: Date.now().toString(),
+        id: 'admin_' + Math.random().toString(36).substring(2),
         name,
         email,
         password,
         type,
-        organization: type === 'staff' ? organization : '',
+        organization,
         createdAt: new Date().toISOString()
     };
     
     // Add new user to admin users
     adminUsers.push(newUser);
     
-    // Save admin users to localStorage
+    // Save admin users
     localStorage.setItem('admin_users', JSON.stringify(adminUsers));
     
     // Show success message
@@ -293,109 +203,191 @@ function loadNotificationContent() {
     
     // Get notification content container
     const notificationContent = document.getElementById('notification-content');
-    if (!notificationContent) return;
+    if (notificationContent) {
+        // Load notification templates
+        const templateContainer = document.getElementById('notification-templates-container');
+        if (templateContainer) {
+            // Load notification templates
+            fetch('/notification-templates.html')
+                .then(response => response.text())
+                .then(html => {
+                    templateContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading notification templates:', error);
+                });
+        }
+        
+        // Load user segments
+        const segmentContainer = document.getElementById('user-segments-container');
+        if (segmentContainer) {
+            // Load user segments
+            fetch('/user-segments.html')
+                .then(response => response.text())
+                .then(html => {
+                    segmentContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading user segments:', error);
+                });
+        }
+        
+        // Load campaigns
+        const campaignContainer = document.getElementById('campaigns-container');
+        if (campaignContainer) {
+            // Load campaigns
+            fetch('/campaigns.html')
+                .then(response => response.text())
+                .then(html => {
+                    campaignContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading campaigns:', error);
+                });
+        }
+    }
+}
+
+// Load draw content
+function loadDrawContent() {
+    console.log('Loading Draw Content...');
     
-    // Clear existing content
-    notificationContent.innerHTML = `
-        <div class="page-header">
-            <h1>Notification Management</h1>
-        </div>
-        <div class="notification-tabs">
-            <ul class="nav-tabs">
-                <li class="nav-tab active" data-tab="templates">Templates</li>
-                <li class="nav-tab" data-tab="segments">User Segments</li>
-                <li class="nav-tab" data-tab="campaigns">Campaigns</li>
-                <li class="nav-tab" data-tab="logs">Logs</li>
-            </ul>
-        </div>
-        <div class="tab-content">
-            <div id="templates-tab" class="tab-pane active">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Notification Templates</h2>
-                        <button class="btn btn-primary" id="add-template-btn">
-                            <i class="fas fa-plus"></i> Add Template
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Content</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="templates-table-body">
-                                <tr>
-                                    <td>Welcome Message</td>
-                                    <td>SMS</td>
-                                    <td>Welcome to Bridgetunes! Your number {{msisdn}} is now registered.</td>
-                                    <td>2023-04-15</td>
-                                    <td>
-                                        <button class="btn btn-icon btn-edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Draw Reminder</td>
-                                    <td>SMS</td>
-                                    <td>Don't forget! The next draw is tomorrow at 8PM. Current jackpot: ₦{{jackpot_amount}}.</td>
-                                    <td>2023-04-16</td>
-                                    <td>
-                                        <button class="btn btn-icon btn-edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div id="segments-tab" class="tab-pane">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">User Segments</h2>
-                        <button class="btn btn-primary" id="add-segment-btn">
-                            <i class="fas fa-plus"></i> Add Segment
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Criteria</th>
-                                    <th>User Count</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="segments-table-body">
-                                <tr>
-                                    <td>High Value Users</td>
-                                    <td>Top-up > ₦1,000</td>
-                                    <td>1,245</td>
-                                    <td>2023-04-15</td>
-                                    <td>
-                                        <button class="btn btn-icon btn-edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                            
-(Content truncated due to size limit. Use line ranges to read in chunks)
+    // Get draw content container
+    const drawContent = document.getElementById('draw-content');
+    if (drawContent) {
+        // Load draw engine
+        const drawEngineContainer = document.getElementById('draw-engine-container');
+        if (drawEngineContainer) {
+            // Load draw engine
+            fetch('/draw-engine.html')
+                .then(response => response.text())
+                .then(html => {
+                    drawEngineContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading draw engine:', error);
+                });
+        }
+        
+        // Load draw history
+        const drawHistoryContainer = document.getElementById('draw-history-container');
+        if (drawHistoryContainer) {
+            // Load draw history
+            fetch('/draw-history.html')
+                .then(response => response.text())
+                .then(html => {
+                    drawHistoryContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading draw history:', error);
+                });
+        }
+    }
+}
+
+// Load user content
+function loadUserContent() {
+    console.log('Loading User Content...');
+    
+    // Get user content container
+    const userContent = document.getElementById('user-content');
+    if (userContent) {
+        // Load user management
+        const userManagementContainer = document.getElementById('user-management-container');
+        if (userManagementContainer) {
+            // Load user management
+            fetch('/user-management.html')
+                .then(response => response.text())
+                .then(html => {
+                    userManagementContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading user management:', error);
+                });
+        }
+    }
+}
+
+// Load transaction content
+function loadTransactionContent() {
+    console.log('Loading Transaction Content...');
+    
+    // Get transaction content container
+    const transactionContent = document.getElementById('transaction-content');
+    if (transactionContent) {
+        // Load transaction management
+        const transactionManagementContainer = document.getElementById('transaction-management-container');
+        if (transactionManagementContainer) {
+            // Load transaction management
+            fetch('/transactions.html')
+                .then(response => response.text())
+                .then(html => {
+                    transactionManagementContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading transaction management:', error);
+                });
+        }
+    }
+}
+
+// Direct content loading for existing HTML structure
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        console.log('User is logged in, loading content...');
+        
+        // Add event listener for hash changes to load content
+        window.addEventListener('hashchange', loadContentForCurrentPage);
+        
+        // Load content for current page
+        loadContentForCurrentPage();
+    }
+});
+
+// Load content for current page based on URL hash
+function loadContentForCurrentPage() {
+    const hash = window.location.hash.replace('#', '') || 'dashboard';
+    console.log('Loading content for page:', hash);
+    
+    // Load content based on hash
+    switch(hash) {
+        case 'notification':
+            loadNotificationContent();
+            break;
+        case 'draw':
+            loadDrawContent();
+            break;
+        case 'user':
+            loadUserContent();
+            break;
+        case 'transaction':
+            loadTransactionContent();
+            break;
+        case 'dashboard':
+        default:
+            // Load dashboard content
+            break;
+    }
+}
+
+// Export functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initializeAdminPortal,
+        initializeNotificationManagement,
+        initializeDrawManagement,
+        initializeUserManagement,
+        initializeCSVUpload,
+        initializeAdminCreation,
+        createAdminUser,
+        loadComponentContent,
+        loadNotificationContent,
+        loadDrawContent,
+        loadUserContent,
+        loadTransactionContent,
+        loadContentForCurrentPage
+    };
+}
+

@@ -1048,5 +1048,38 @@
             }
         }
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Simple login handler
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    // Fetch admin users
+    fetch('admin-users.json')
+      .then(response => response.json())
+      .then(users => {
+        const user = users.find(u => u.username === email && u.password === password);
+        if (user) {
+          // Store user info in localStorage
+          localStorage.setItem('bridgetunes_admin_token', 'admin-token-' + Date.now());
+          localStorage.setItem('bridgetunes_admin_user', JSON.stringify(user));
+          
+          // Redirect to dashboard
+          window.location.hash = 'dashboard';
+          location.reload();
+        } else {
+          alert('Invalid email or password. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading admin users:', error);
+        alert('Error loading admin users. Please try again.');
+      });
+  });
+});
+</script>
+
 </body>
 </html>

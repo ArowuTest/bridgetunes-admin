@@ -1,0 +1,238 @@
+<!-- Draw Management Template -->
+<div class="draw-management-container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Draw Engine</h5>
+                    <div class="draw-engine-controls">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="draw-date">Draw Date</label>
+                                <input type="date" class="form-control" id="draw-date">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="draw-type">Draw Type</label>
+                                <select class="form-control" id="draw-type">
+                                    <option value="daily">Daily Draw (₦1,000,000)</option>
+                                    <option value="saturday">Saturday Draw (₦3,000,000)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="filter-type">Filter Type</label>
+                                <select class="form-control" id="filter-type">
+                                    <option value="all">All Numbers</option>
+                                    <option value="ending">Numbers Ending With</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="ending-digits-container" style="display: none;">
+                            <div class="col-md-12">
+                                <label>Select Ending Digits</label>
+                                <div class="ending-digits-selector">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-0" value="0">
+                                        <label class="form-check-label" for="digit-0">0</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-1" value="1">
+                                        <label class="form-check-label" for="digit-1">1</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-2" value="2">
+                                        <label class="form-check-label" for="digit-2">2</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-3" value="3">
+                                        <label class="form-check-label" for="digit-3">3</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-4" value="4">
+                                        <label class="form-check-label" for="digit-4">4</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-5" value="5">
+                                        <label class="form-check-label" for="digit-5">5</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-6" value="6">
+                                        <label class="form-check-label" for="digit-6">6</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-7" value="7">
+                                        <label class="form-check-label" for="digit-7">7</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-8" value="8">
+                                        <label class="form-check-label" for="digit-8">8</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="digit-9" value="9">
+                                        <label class="form-check-label" for="digit-9">9</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-primary" id="run-draw-btn">
+                                    <i class="fas fa-play"></i> Run Draw
+                                </button>
+                                <button class="btn btn-secondary" id="preview-eligible-btn">
+                                    <i class="fas fa-eye"></i> Preview Eligible Numbers
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Draw History</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Draw Type</th>
+                                    <th>Filter</th>
+                                    <th>Eligible Numbers</th>
+                                    <th>Winners</th>
+                                    <th>Jackpot Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="draw-history-table">
+                                <tr>
+                                    <td>2025-04-26</td>
+                                    <td>Daily Draw</td>
+                                    <td>All Numbers</td>
+                                    <td>12,345</td>
+                                    <td>5</td>
+                                    <td>₦1,000,000</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-04-25</td>
+                                    <td>Daily Draw</td>
+                                    <td>Ending with 0,1</td>
+                                    <td>2,468</td>
+                                    <td>3</td>
+                                    <td>₦1,000,000</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-04-24</td>
+                                    <td>Daily Draw</td>
+                                    <td>Ending with 2,3</td>
+                                    <td>2,471</td>
+                                    <td>4</td>
+                                    <td>₦1,000,000</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-04-20</td>
+                                    <td>Saturday Draw</td>
+                                    <td>All Numbers</td>
+                                    <td>15,789</td>
+                                    <td>10</td>
+                                    <td>₦3,000,000</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Jackpot Configuration</h5>
+                    <form id="jackpot-config-form">
+                        <div class="mb-3">
+                            <label for="daily-jackpot">Daily Draw Jackpot</label>
+                            <input type="text" class="form-control" id="daily-jackpot" value="₦1,000,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="daily-second-prize">Daily Draw 2nd Prize</label>
+                            <input type="text" class="form-control" id="daily-second-prize" value="₦350,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="daily-third-prize">Daily Draw 3rd Prize</label>
+                            <input type="text" class="form-control" id="daily-third-prize" value="₦100,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="saturday-jackpot">Saturday Draw Jackpot</label>
+                            <input type="text" class="form-control" id="saturday-jackpot" value="₦3,000,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="saturday-second-prize">Saturday Draw 2nd Prize</label>
+                            <input type="text" class="form-control" id="saturday-second-prize" value="₦1,000,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="saturday-third-prize">Saturday Draw 3rd Prize</label>
+                            <input type="text" class="form-control" id="saturday-third-prize" value="₦500,000">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Rollover Configuration</h5>
+                    <form id="rollover-config-form">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enable-rollover" checked>
+                                <label class="form-check-label" for="enable-rollover">
+                                    Enable Jackpot Rollover for Unclaimed Prizes
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rollover-percentage">Rollover Percentage</label>
+                            <input type="range" class="form-range" id="rollover-percentage" min="0" max="100" value="100">
+                            <div class="d-flex justify-content-between">
+                                <span>0%</span>
+                                <span id="rollover-percentage-value">100%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="max-rollover">Maximum Rollover Amount</label>
+                            <input type="text" class="form-control" id="max-rollover" value="₦10,000,000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rollover-cap">Rollover Cap</label>
+                            <select class="form-control" id="rollover-cap">
+                                <option value="none">No Cap</option>
+                                <option value="amount">Cap by Amount</option>
+                                <option value="draws">Cap by Number of Draws</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

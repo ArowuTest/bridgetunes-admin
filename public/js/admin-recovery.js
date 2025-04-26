@@ -149,10 +149,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Check for recovery mode on protected pages
-  if (window.location.pathname.includes('draw-engine.html') || 
-      window.location.pathname.includes('user-management.html') ||
-      window.location.pathname.includes('csv-upload.html')) {
-    
+  if (window.location.pathname.includes('index.html') || 
+    window.location.hash.includes('dashboard') ||
+    window.location.hash.includes('draw') ||
+    window.location.hash.includes('user') ||
+    window.location.hash.includes('csv')) {
+
     const recoveryMode = localStorage.getItem('recovery_mode');
     
     if (recoveryMode === 'true') {
@@ -213,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Add event listener to reset password button
       const resetButton = banner.querySelector('.reset-password-button');
       resetButton.addEventListener('click', function() {
-        window.location.href = 'forgot-password.html';
+        window.location.href = 'index.html#dashboard';
       });
     }
   }

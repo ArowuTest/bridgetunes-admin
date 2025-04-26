@@ -1,502 +1,366 @@
-// Jackpot Prize Logic Implementation
-// This file implements the draw eligibility rules, rollover mechanism, and winner validation
+// Jackpot Prize Logic Implementation for Bridgetunes MTN Promotion
+// This module handles the draw eligibility rules, prize structure, rollover mechanism, and winner validation
 
 class JackpotPrizeLogic {
   constructor() {
+    // Initialize prize structure with correct values
     this.prizeStructure = {
       daily: [
-        { type: 'cash', amount: 5000, count: 5, label: '₦5,000 Cash Prize' },
-        { type: 'cash', amount: 10000, count: 3, label: '₦10,000 Cash Prize' },
-        { type: 'cash', amount: 20000, count: 1, label: '₦20,000 Cash Prize' }
+        { type: 'cash', amount: 1000000, count: 1, label: '₦1,000,000 Jackpot (1st Prize)' },
+        { type: 'cash', amount: 350000, count: 1, label: '₦350,000 2nd Prize' },
+        { type: 'cash', amount: 150000, count: 1, label: '₦150,000 3rd Prize' },
+        { type: 'cash', amount: 75000, count: 7, label: '₦75,000 Concession Prize' }
       ],
-      weekly: [
-        { type: 'cash', amount: 50000, count: 3, label: '₦50,000 Cash Prize' },
-        { type: 'cash', amount: 100000, count: 1, label: '₦100,000 Cash Prize' }
-      ],
-      monthly: [
-        { type: 'cash', amount: 500000, count: 1, label: '₦500,000 Cash Prize' }
-      ],
-      jackpot: [
-        { type: 'jackpot', amount: 5000000, count: 1, label: '₦5,000,000 Jackpot Prize' }
+      saturday: [
+        { type: 'cash', amount: 3000000, count: 1, label: '₦3,000,000 Jackpot (1st Prize)' },
+        { type: 'cash', amount: 1000000, count: 1, label: '₦1,000,000 2nd Prize' },
+        { type: 'cash', amount: 500000, count: 1, label: '₦500,000 3rd Prize' },
+        { type: 'cash', amount: 100000, count: 7, label: '₦100,000 Concession Prize' }
       ]
     };
     
-    this.eligibilityRules = {
-      daily: {
-        minTopup: 100, // Minimum topup amount for daily draw
-        daysSinceTopup: 1, // Topup must be within 1 day
-        optInRequired: true,
-        blacklistExcluded: true,
-        endDigitMapping: {
-          0: 'Monday',
-          1: 'Monday',
-          2: 'Tuesday',
-          3: 'Tuesday',
-          4: 'Wednesday',
-          5: 'Wednesday',
-          6: 'Thursday',
-          7: 'Thursday',
-          8: 'Friday',
-          9: 'Friday'
-        }
-      },
-      weekly: {
-        minTopup: 200, // Minimum topup amount for weekly draw
-        daysSinceTopup: 7, // Topup must be within 7 days
-        optInRequired: true,
-        blacklistExcluded: true
-      },
-      monthly: {
-        minTopup: 500, // Minimum topup amount for monthly draw
-        daysSinceTopup: 30, // Topup must be within 30 days
-        optInRequired: true,
-        blacklistExcluded: true
-      },
-      jackpot: {
-        minTopup: 1000, // Minimum topup amount for jackpot draw
-        daysSinceTopup: 30, // Topup must be within 30 days
-        optInRequired: true,
-        blacklistExcluded: true,
-        consecutiveWeeks: 4 // Must have eligible topups for 4 consecutive weeks
-      }
+    // Initialize rollover amounts
+    this.rolloverAmounts = {
+      daily: 0,
+      saturday: 0
     };
     
-    this.rolloverRules = {
-      daily: {
-        rolloverEnabled: true,
-        maxRolloverCount: 3, // Roll over up to 3 times
-        rolloverDestination: 'weekly' // Roll over to weekly prize pool
-      },
-      weekly: {
-        rolloverEnabled: true,
-        maxRolloverCount: 2, // Roll over up to 2 times
-        rolloverDestination: 'monthly' // Roll over to monthly prize pool
-      },
-      monthly: {
-        rolloverEnabled: true,
-        maxRolloverCount: 1, // Roll over up to 1 time
-        rolloverDestination: 'jackpot' // Roll over to jackpot prize pool
-      },
-      jackpot: {
-        rolloverEnabled: true,
-        maxRolloverCount: 0, // No rollover for jackpot
-        rolloverDestination: null
-      }
+    // Initialize draw history
+    this.drawHistory = [];
+    
+    // Initialize MSISDN digit mapping for days
+    this.digitMapping = {
+      monday: ['0', '1'],
+      tuesday: ['2', '3'],
+      wednesday: ['4', '5'],
+      thursday: ['6', '7'],
+      friday: ['8', '9'],
+      saturday: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] // All digits eligible on Saturday
     };
     
-    this.drawSchedule = {
-      daily: {
-        frequency: 'daily',
-        time: '19:00',
-        daysOfWeek: [1, 2, 3, 4, 5], // Monday to Friday
-        excludeHolidays: true
-      },
-      weekly: {
-        frequency: 'weekly',
-        dayOfWeek: 5, // Friday
-        time: '20:00',
-        excludeHolidays: false
-      },
-      monthly: {
-        frequency: 'monthly',
-        dayOfMonth: 'last', // Last day of month
-        time: '20:00',
-        excludeHolidays: false
-      },
-      jackpot: {
-        frequency: 'custom',
-        dates: [], // Custom dates for jackpot draws
-        time: '20:00',
-        excludeHolidays: false
-      }
-    };
-    
-    // Current prize pools with rollover tracking
-    this.prizePools = {
-      daily: {
-        currentAmount: 0,
-        baseAmount: 100000, // ₦100,000 base daily prize pool
-        rolloverCount: 0,
-        lastWinDate: null
-      },
-      weekly: {
-        currentAmount: 0,
-        baseAmount: 500000, // ₦500,000 base weekly prize pool
-        rolloverCount: 0,
-        lastWinDate: null
-      },
-      monthly: {
-        currentAmount: 0,
-        baseAmount: 2000000, // ₦2,000,000 base monthly prize pool
-        rolloverCount: 0,
-        lastWinDate: null
-      },
-      jackpot: {
-        currentAmount: 0,
-        baseAmount: 5000000, // ₦5,000,000 base jackpot prize pool
-        rolloverCount: 0,
-        lastWinDate: null
-      }
-    };
-    
-    // Initialize prize pools
-    this.initializePrizePools();
-  }
-  
-  // Initialize prize pools with base amounts
-  initializePrizePools() {
-    Object.keys(this.prizePools).forEach(poolType => {
-      this.prizePools[poolType].currentAmount = this.prizePools[poolType].baseAmount;
-    });
+    // Initialize KYC requirements based on prize amount
+    this.kycRequirements = [
+      { threshold: 50000, requirements: ['phone_verification'] },
+      { threshold: 500000, requirements: ['phone_verification', 'id_verification'] },
+      { threshold: 1000000, requirements: ['phone_verification', 'id_verification', 'bank_verification'] }
+    ];
   }
   
   // Check if a user is eligible for a specific draw type
   checkEligibility(user, drawType) {
-    if (!user || !drawType || !this.eligibilityRules[drawType]) {
-      return { eligible: false, reason: 'Invalid user or draw type' };
-    }
-    
-    const rules = this.eligibilityRules[drawType];
-    
     // Check if user has opted in
-    if (rules.optInRequired && !user.optedIn) {
-      return { eligible: false, reason: 'User has not opted in' };
+    if (!user.optedIn) {
+      return {
+        eligible: false,
+        reason: 'User has not opted in to the promotion'
+      };
     }
     
     // Check if user is blacklisted
-    if (rules.blacklistExcluded && user.blacklisted) {
-      return { eligible: false, reason: 'User is blacklisted' };
+    if (user.blacklisted) {
+      return {
+        eligible: false,
+        reason: 'User is blacklisted'
+      };
     }
     
-    // Check if user has made a qualifying topup
-    const qualifyingTopup = this.findQualifyingTopup(user.topups, rules.minTopup, rules.daysSinceTopup);
-    if (!qualifyingTopup) {
-      return { eligible: false, reason: `No qualifying topup of ₦${rules.minTopup} or more within the last ${rules.daysSinceTopup} days` };
+    // Check if user has qualifying topups
+    if (!user.topups || user.topups.length === 0) {
+      return {
+        eligible: false,
+        reason: 'No topups found for user'
+      };
     }
     
-    // For daily draws, check if the MSISDN's last digit matches the day's allocation
+    // Check if user has topups within the qualifying period
+    const now = new Date();
+    const qualifyingPeriod = this.getQualifyingPeriod(drawType);
+    const qualifyingTopups = user.topups.filter(topup => {
+      const topupDate = new Date(topup.date);
+      return (now - topupDate) <= qualifyingPeriod;
+    });
+    
+    if (qualifyingTopups.length === 0) {
+      return {
+        eligible: false,
+        reason: 'No qualifying topups within the required period'
+      };
+    }
+    
+    // Check if user's MSISDN ends with the correct digits for the day
+    const today = this.getDayOfWeek();
+    const lastDigit = user.msisdn.slice(-1);
+    
     if (drawType === 'daily') {
-      const lastDigit = parseInt(user.msisdn.slice(-1));
-      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-      
-      if (rules.endDigitMapping[lastDigit] !== today) {
-        return { 
-          eligible: false, 
-          reason: `MSISDN ending in ${lastDigit} is eligible for ${rules.endDigitMapping[lastDigit]} draws, not ${today}` 
+      const eligibleDigits = this.digitMapping[today.toLowerCase()];
+      if (!eligibleDigits.includes(lastDigit)) {
+        return {
+          eligible: false,
+          reason: `MSISDN ending in ${lastDigit} is not eligible for ${today}'s draw`
         };
       }
     }
     
-    // For jackpot draws, check consecutive weeks requirement
-    if (drawType === 'jackpot' && rules.consecutiveWeeks > 0) {
-      const hasConsecutiveTopups = this.checkConsecutiveWeeklyTopups(user.topups, rules.minTopup, rules.consecutiveWeeks);
-      if (!hasConsecutiveTopups) {
-        return { 
-          eligible: false, 
-          reason: `User does not have qualifying topups for ${rules.consecutiveWeeks} consecutive weeks` 
-        };
-      }
-    }
-    
-    return { 
-      eligible: true, 
-      qualifyingTopup 
+    // If all checks pass, user is eligible
+    return {
+      eligible: true,
+      qualifyingTopup: qualifyingTopups[0] // Return the first qualifying topup
     };
   }
   
-  // Find a qualifying topup based on amount and recency
-  findQualifyingTopup(topups, minAmount, maxDaysSince) {
-    if (!topups || !Array.isArray(topups) || topups.length === 0) {
-      return null;
+  // Get the qualifying period for a specific draw type
+  getQualifyingPeriod(drawType) {
+    switch (drawType) {
+      case 'daily':
+        return 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      case 'saturday':
+        return 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+      default:
+        return 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
     }
-    
-    const now = new Date();
-    const cutoffDate = new Date(now);
-    cutoffDate.setDate(cutoffDate.getDate() - maxDaysSince);
-    
-    // Sort topups by date descending (most recent first)
-    const sortedTopups = [...topups].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    // Find the first topup that meets the criteria
-    return sortedTopups.find(topup => {
-      const topupDate = new Date(topup.date);
-      return topup.amount >= minAmount && topupDate >= cutoffDate;
-    });
   }
   
-  // Check if user has qualifying topups for consecutive weeks
-  checkConsecutiveWeeklyTopups(topups, minAmount, consecutiveWeeks) {
-    if (!topups || !Array.isArray(topups) || topups.length === 0) {
-      return false;
-    }
-    
+  // Get the current day of the week
+  getDayOfWeek() {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const now = new Date();
-    const weeks = [];
-    
-    // Initialize array to track each of the past N weeks
-    for (let i = 0; i < consecutiveWeeks; i++) {
-      const weekStart = new Date(now);
-      weekStart.setDate(weekStart.getDate() - (7 * i + 7)); // Start from last complete week
-      
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      
-      weeks.push({
-        start: weekStart,
-        end: weekEnd,
-        hasQualifyingTopup: false
-      });
-    }
-    
-    // Check each topup against each week
-    topups.forEach(topup => {
-      const topupDate = new Date(topup.date);
-      
-      weeks.forEach(week => {
-        if (topupDate >= week.start && topupDate <= week.end && topup.amount >= minAmount) {
-          week.hasQualifyingTopup = true;
-        }
-      });
-    });
-    
-    // Check if all weeks have qualifying topups
-    return weeks.every(week => week.hasQualifyingTopup);
+    return days[now.getDay()];
   }
   
   // Conduct a draw for a specific draw type
   conductDraw(drawType, eligibleUsers) {
-    if (!drawType || !this.prizeStructure[drawType]) {
-      throw new Error(`Invalid draw type: ${drawType}`);
-    }
-    
-    if (!eligibleUsers || !Array.isArray(eligibleUsers) || eligibleUsers.length === 0) {
-      return this.handleNoEligibleUsers(drawType);
-    }
-    
-    const prizes = this.prizeStructure[drawType];
-    const results = {
-      drawType,
-      drawDate: new Date().toISOString(),
-      prizePool: this.prizePools[drawType].currentAmount,
-      winners: [],
-      rollovers: []
-    };
-    
-    // Shuffle eligible users to ensure randomness
-    const shuffledUsers = this.shuffleArray([...eligibleUsers]);
-    
-    // Assign prizes to winners
-    prizes.forEach(prize => {
-      for (let i = 0; i < prize.count; i++) {
-        if (shuffledUsers.length > 0) {
-          const winner = shuffledUsers.shift(); // Take the next user from the shuffled array
-          
-          results.winners.push({
-            msisdn: winner.msisdn,
-            prize: {
-              type: prize.type,
-              amount: prize.amount,
-              label: prize.label
-            },
-            qualifyingTopup: winner.qualifyingTopup
-          });
-          
-          // If this is a jackpot prize, reset the jackpot pool
-          if (prize.type === 'jackpot') {
-            this.prizePools.jackpot.lastWinDate = new Date().toISOString();
-            this.prizePools.jackpot.currentAmount = this.prizePools.jackpot.baseAmount;
-            this.prizePools.jackpot.rolloverCount = 0;
-          }
-        } else {
-          // Not enough eligible users for all prizes, handle rollover
-          const rollover = this.handlePrizeRollover(drawType, prize);
-          if (rollover) {
-            results.rollovers.push(rollover);
-          }
-        }
-      }
-    });
-    
-    return results;
-  }
-  
-  // Handle case when there are no eligible users for a draw
-  handleNoEligibleUsers(drawType) {
-    const results = {
-      drawType,
-      drawDate: new Date().toISOString(),
-      prizePool: this.prizePools[drawType].currentAmount,
-      winners: [],
-      rollovers: []
-    };
-    
-    // Roll over all prizes
-    this.prizeStructure[drawType].forEach(prize => {
-      for (let i = 0; i < prize.count; i++) {
-        const rollover = this.handlePrizeRollover(drawType, prize);
-        if (rollover) {
-          results.rollovers.push(rollover);
-        }
-      }
-    });
-    
-    return results;
-  }
-  
-  // Handle prize rollover logic
-  handlePrizeRollover(drawType, prize) {
-    const rolloverRules = this.rolloverRules[drawType];
-    
-    if (!rolloverRules.rolloverEnabled || rolloverRules.maxRolloverCount <= 0) {
-      return null; // Rollover not enabled for this draw type
-    }
-    
-    const prizePool = this.prizePools[drawType];
-    
-    if (prizePool.rolloverCount >= rolloverRules.maxRolloverCount) {
-      // Maximum rollover count reached, donate to charity instead
+    if (!eligibleUsers || eligibleUsers.length === 0) {
       return {
-        from: drawType,
-        to: 'charity',
-        amount: prize.amount,
-        reason: `Maximum rollover count (${rolloverRules.maxRolloverCount}) reached`
+        success: false,
+        message: 'No eligible users for the draw'
       };
     }
     
-    const destinationPool = rolloverRules.rolloverDestination;
-    
-    if (!destinationPool || !this.prizePools[destinationPool]) {
-      return null; // No valid destination for rollover
+    // Get the prize structure for the draw type
+    const prizes = this.getPrizes(drawType);
+    if (!prizes) {
+      return {
+        success: false,
+        message: `Invalid draw type: ${drawType}`
+      };
     }
     
-    // Add prize amount to destination pool
-    this.prizePools[destinationPool].currentAmount += prize.amount;
+    // Shuffle the eligible users to randomize the draw
+    const shuffledUsers = this.shuffleArray([...eligibleUsers]);
     
-    // Increment rollover count
-    prizePool.rolloverCount++;
+    // Select winners based on prize count
+    const winners = [];
+    let userIndex = 0;
+    
+    for (const prize of prizes) {
+      for (let i = 0; i < prize.count; i++) {
+        if (userIndex < shuffledUsers.length) {
+          const winner = shuffledUsers[userIndex];
+          winners.push({
+            user: winner,
+            prize: prize,
+            drawType: drawType,
+            drawDate: new Date(),
+            validated: false
+          });
+          userIndex++;
+        }
+      }
+    }
+    
+    // Check if we have enough winners
+    if (winners.length === 0) {
+      return {
+        success: false,
+        message: 'Not enough eligible users for the draw'
+      };
+    }
+    
+    // Add the draw to history
+    this.drawHistory.push({
+      drawType: drawType,
+      drawDate: new Date(),
+      winners: winners
+    });
     
     return {
-      from: drawType,
-      to: destinationPool,
-      amount: prize.amount,
-      reason: 'No eligible winner'
+      success: true,
+      winners: winners
     };
   }
   
-  // Validate a winner after selection
+  // Get the prizes for a specific draw type
+  getPrizes(drawType) {
+    // Check if it's Saturday
+    const today = this.getDayOfWeek();
+    if (today === 'Saturday') {
+      return this.prizeStructure.saturday;
+    } else if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(today)) {
+      return this.prizeStructure.daily;
+    } else {
+      // No draws on Sunday
+      return null;
+    }
+  }
+  
+  // Shuffle an array using Fisher-Yates algorithm
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+  
+  // Validate a winner based on KYC requirements
   validateWinner(winner, drawType) {
-    if (!winner || !drawType) {
-      return { valid: false, reason: 'Invalid winner or draw type' };
+    // Check if winner is valid
+    if (!winner || !winner.user) {
+      return {
+        valid: false,
+        reason: 'Invalid winner data'
+      };
     }
     
-    // Check if MSISDN is valid
-    if (!winner.msisdn || !/^234\d{10}$/.test(winner.msisdn)) {
-      return { valid: false, reason: 'Invalid MSISDN format' };
+    // Check if winner has opted in
+    if (!winner.user.optedIn) {
+      return {
+        valid: false,
+        reason: 'Winner has not opted in to the promotion'
+      };
     }
     
-    // Check if user is blacklisted (double-check even though we filtered earlier)
-    if (winner.blacklisted) {
-      return { valid: false, reason: 'User is blacklisted' };
+    // Check if winner is blacklisted
+    if (winner.user.blacklisted) {
+      return {
+        valid: false,
+        reason: 'Winner is blacklisted'
+      };
     }
     
-    // Check if user has opted in (double-check even though we filtered earlier)
-    if (!winner.optedIn) {
-      return { valid: false, reason: 'User has not opted in' };
-    }
-    
-    // Check if user has already won in this draw cycle (daily/weekly/monthly)
-    if (winner.recentWins && winner.recentWins.some(win => 
-      win.drawType === drawType && 
-      new Date(win.date) >= this.getDrawCycleStartDate(drawType)
-    )) {
-      return { valid: false, reason: `User has already won a ${drawType} prize in this cycle` };
-    }
-    
-    // For jackpot winners, perform additional verification
-    if (drawType === 'jackpot') {
-      // Check KYC verification status
-      if (!winner.kycVerified) {
-        return { 
-          valid: false, 
-          reason: 'Jackpot winner must complete KYC verification',
-          action: 'initiateKYC'
-        };
-      }
-      
-      // Check account age
-      const accountAgeInDays = this.calculateAccountAge(winner.registrationDate);
-      if (accountAgeInDays < 30) { // Require at least 30 days account age for jackpot
-        return { 
-          valid: false, 
-          reason: 'Account must be at least 30 days old to win jackpot',
-          accountAge: accountAgeInDays
-        };
-      }
-    }
-    
-    return { valid: true };
-  }
-  
-  // Get the start date of the current draw cycle
-  getDrawCycleStartDate(drawType) {
-    const now = new Date();
-    let cycleStart = new Date(now);
-    
-    switch (drawType) {
-      case 'daily':
-        cycleStart.setHours(0, 0, 0, 0); // Start of today
-        break;
-      case 'weekly':
-        // Start of current week (assuming week starts on Monday)
-        const day = cycleStart.getDay();
-        const diff = cycleStart.getDate() - day + (day === 0 ? -6 : 1);
-        cycleStart.setDate(diff);
-        cycleStart.setHours(0, 0, 0, 0);
-        break;
-      case 'monthly':
-        // Start of current month
-        cycleStart.setDate(1);
-        cycleStart.setHours(0, 0, 0, 0);
-        break;
-      case 'jackpot':
-        // Jackpot is a special case, use a 90-day lookback period
-        cycleStart.setDate(cycleStart.getDate() - 90);
-        cycleStart.setHours(0, 0, 0, 0);
-        break;
-      default:
-        cycleStart.setHours(0, 0, 0, 0); // Default to start of today
-    }
-    
-    return cycleStart;
-  }
-  
-  // Calculate account age in days
-  calculateAccountAge(registrationDate) {
-    if (!registrationDate) return 0;
-    
-    const regDate = new Date(registrationDate);
-    const now = new Date();
-    const diffTime = Math.abs(now - regDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
-  }
-  
-  // Process prize claim
-  processPrizeClaim(winner, drawType) {
-    if (!winner || !drawType) {
-      return { success: false, reason: 'Invalid winner or draw type' };
-    }
-    
-    const validation = this.validateWinner(winner, drawType);
-    if (!validation.valid) {
-      return { success: false, reason: validation.reason, details: validation };
-    }
-    
-    // Generate claim reference
-    const claimReference = this.generateClaimReference(winner.msisdn, drawType);
-    
-    // Determine claim method based on prize amount
+    // Determine KYC requirements based on prize amount
     const prizeAmount = winner.prize.amount;
-    let claimMet
-(Content truncated due to size limit. Use line ranges to read in chunks)
+    const requiredKyc = this.getKycRequirements(prizeAmount);
+    
+    // Check if winner meets KYC requirements
+    const missingKyc = requiredKyc.filter(req => !winner.user.kyc || !winner.user.kyc.includes(req));
+    
+    if (missingKyc.length > 0) {
+      return {
+        valid: true,
+        pendingKyc: missingKyc,
+        message: 'Winner needs to complete KYC requirements before prize can be awarded'
+      };
+    }
+    
+    // If all checks pass, winner is valid
+    return {
+      valid: true,
+      message: 'Winner is valid and can receive prize'
+    };
+  }
+  
+  // Get KYC requirements based on prize amount
+  getKycRequirements(prizeAmount) {
+    let requirements = [];
+    
+    for (const kyc of this.kycRequirements) {
+      if (prizeAmount >= kyc.threshold) {
+        requirements = kyc.requirements;
+      }
+    }
+    
+    return requirements;
+  }
+  
+  // Handle rollover for unclaimed prizes
+  handleRollover(drawType, unclaimedPrizes) {
+    if (!unclaimedPrizes || unclaimedPrizes.length === 0) {
+      return {
+        success: false,
+        message: 'No unclaimed prizes to rollover'
+      };
+    }
+    
+    // Calculate total unclaimed amount
+    let totalUnclaimed = 0;
+    for (const prize of unclaimedPrizes) {
+      totalUnclaimed += prize.amount;
+    }
+    
+    // Add to rollover amount
+    if (drawType === 'daily') {
+      this.rolloverAmounts.daily += totalUnclaimed;
+    } else if (drawType === 'saturday') {
+      this.rolloverAmounts.saturday += totalUnclaimed;
+    }
+    
+    return {
+      success: true,
+      rolloverAmount: totalUnclaimed,
+      totalRollover: drawType === 'daily' ? this.rolloverAmounts.daily : this.rolloverAmounts.saturday
+    };
+  }
+  
+  // Get the current rollover amount for a specific draw type
+  getRolloverAmount(drawType) {
+    if (drawType === 'daily') {
+      return this.rolloverAmounts.daily;
+    } else if (drawType === 'saturday') {
+      return this.rolloverAmounts.saturday;
+    } else {
+      return 0;
+    }
+  }
+  
+  // Get the draw history
+  getDrawHistory() {
+    return this.drawHistory;
+  }
+  
+  // Get the total prize pool for a specific draw type
+  getTotalPrizePool(drawType) {
+    const prizes = this.getPrizes(drawType);
+    if (!prizes) {
+      return 0;
+    }
+    
+    let total = 0;
+    for (const prize of prizes) {
+      total += prize.amount * prize.count;
+    }
+    
+    // Add rollover amount
+    total += this.getRolloverAmount(drawType);
+    
+    return total;
+  }
+  
+  // Get the prize breakdown for display
+  getPrizeBreakdown(drawType) {
+    const prizes = this.getPrizes(drawType);
+    if (!prizes) {
+      return [];
+    }
+    
+    return prizes.map(prize => {
+      return {
+        label: prize.label,
+        amount: prize.amount,
+        count: prize.count,
+        total: prize.amount * prize.count
+      };
+    });
+  }
+}
+
+// Export the JackpotPrizeLogic class
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = JackpotPrizeLogic;
+}
+
+// Initialize the JackpotPrizeLogic if in browser environment
+if (typeof window !== 'undefined') {
+  window.jackpotPrizeLogic = new JackpotPrizeLogic();
+}
+

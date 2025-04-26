@@ -1,6 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "",
-  "outputDirectory": "public",
-  "framework": "static"
+  "routes": [
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/(.*\\.(json|ico|png|jpg|svg))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/$1" },
+    { "handle": "filesystem" }
+  ]
 }

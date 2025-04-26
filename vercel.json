@@ -1,8 +1,12 @@
 {
   "version": 2,
+  "buildCommand": "echo 'No build required'",
   "outputDirectory": "public",
   "routes": [
-    { "handle": "filesystem" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/(.*\\.(json|js|css|png|jpg|svg|html))", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

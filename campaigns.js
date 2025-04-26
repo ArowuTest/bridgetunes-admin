@@ -1,439 +1,442 @@
-// Campaigns JavaScript functionality
+// Campaigns Module for Notification Management System
+// This file implements the Campaigns functionality for creating and managing notification campaigns
 
-// Global variables
-const API_BASE_URL = 'https://bridgetunes-mtn-backend.onrender.com/api';
-let authToken = null;
-let currentUser = null;
-let performanceChart = null;
+class CampaignsModule {
+  constructor(userSegmentsModule, notificationTemplatesModule) {
+    this.campaigns = [];
+    this.userSegmentsModule = userSegmentsModule;
+    this.notificationTemplatesModule = notificationTemplatesModule;
+    this.campaignTypes = [
+      { id: 'oneTime', label: 'One-time Campaign', description: 'Send a single notification to a target segment' },
+      { id: 'recurring', label: 'Recurring Campaign', description: 'Send notifications on a regular schedule' },
+      { id: 'triggered', label: 'Triggered Campaign', description: 'Send notifications based on user actions or events' },
+      { id: 'multiStep', label: 'Multi-step Campaign', description: 'Send a sequence of notifications over time' },
+      { id: 'abTest', label: 'A/B Test Campaign', description: 'Test different templates with a target segment' }
+    ];
+    this.scheduleTypes = [
+      { id: 'immediate', label: 'Immediate', description: 'Send as soon as campaign is activated' },
+      { id: 'scheduled', label: 'Scheduled', description: 'Send at a specific date and time' },
+      { id: 'recurring', label: 'Recurring', description: 'Send on a regular schedule (daily, weekly, monthly)' }
+    ];
+    this.recurringPatterns = [
+      { id: 'daily', label: 'Daily', description: 'Send every day' },
+      { id: 'weekly', label: 'Weekly', description: 'Send on specific days of the week' },
+      { id: 'monthly', label: 'Monthly', description: 'Send on specific days of the month' }
+    ];
+    this.triggerTypes = [
+      { id: 'topup', label: 'Topup', description: 'Triggered by user topup' },
+      { id: 'optIn', label: 'Opt-in', description: 'Triggered by user opt-in' },
+      { id: 'drawEligibility', label: 'Draw Eligibility', description: 'Triggered by draw eligibility status change' },
+      { id: 'winnerSelection', label: 'Winner Selection', description: 'Triggered when user is selected as winner' },
+      { id: 'inactivity', label: 'Inactivity', description: 'Triggered after period of inactivity' }
+    ];
+  }
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is logged in
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('user');
+  // Create a new campaign
+  createCampaign(name, description, segmentId, templateId, type, schedule, options = {}) {
+    const campaignId = this.generateUniqueId();
     
-    if (token && user) {
-        // User is logged in
-        authToken = token;
-        currentUser = JSON.parse(user);
-        setupEventListeners();
+    // Validate segment and template
+    const segment = this.userSegmentsModule.getSegmentById(segmentId);
+    if (!segment) {
+      throw new Error(`Segment with ID ${segmentId} not found`);
+    }
+    
+    const template = this.notificationTemplatesModule.getTemplateById(templateId);
+    if (!template) {
+      throw new Error(`Template with ID ${templateId} not found`);
+    }
+    
+    // Create campaign object
+    const newCampaign = {
+      id: campaignId,
+      name,
+      description,
+      segment: {
+        id: segment.id,
+        name: segment.name,
+        estimatedSize: segment.estimatedSize
+      },
+      template: {
+        id: template.id,
+        name: template.name,
+        type: template.type
+      },
+      type,
+      schedule,
+      options,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metrics: {
+        sent: 0,
+        delivered: 0,
+        failed: 0,
+        responses: 0,
+        conversions: 0
+      }
+    };
+    
+    // Add type-specific properties
+    switch (type) {
+      case 'recurring':
+        newCampaign.recurringPattern = options.recurringPattern || 'weekly';
+        newCampaign.recurringDays = options.recurringDays || [1]; // Monday by default
+        newCampaign.recurringTime = options.recurringTime || '09:00';
+        break;
+        
+      case 'triggered':
+        newCampaign.triggerType = options.triggerType || 'topup';
+        newCampaign.triggerConditions = options.triggerConditions || {};
+        break;
+        
+      case 'multiStep':
+        newCampaign.steps = options.steps || [];
+        break;
+        
+      case 'abTest':
+        newCampaign.variants = options.variants || [];
+        newCampaign.testDuration = options.testDuration || 7; // 7 days by default
+        newCampaign.winnerCriteria = options.winnerCriteria || 'response';
+        break;
+    }
+    
+    this.campaigns.push(newCampaign);
+    return newCampaign;
+  }
+
+  // Update an existing campaign
+  updateCampaign(campaignId, updates) {
+    const campaignIndex = this.campaigns.findIndex(c => c.id === campaignId);
+    if (campaignIndex === -1) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // Don't allow updating certain properties directly
+    const protectedProps = ['id', 'createdAt', 'metrics'];
+    const filteredUpdates = Object.keys(updates)
+      .filter(key => !protectedProps.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updates[key];
+        return obj;
+      }, {});
+    
+    // Update segment reference if segmentId is provided
+    if (updates.segmentId) {
+      const segment = this.userSegmentsModule.getSegmentById(updates.segmentId);
+      if (!segment) {
+        throw new Error(`Segment with ID ${updates.segmentId} not found`);
+      }
+      filteredUpdates.segment = {
+        id: segment.id,
+        name: segment.name,
+        estimatedSize: segment.estimatedSize
+      };
+      delete filteredUpdates.segmentId;
+    }
+    
+    // Update template reference if templateId is provided
+    if (updates.templateId) {
+      const template = this.notificationTemplatesModule.getTemplateById(updates.templateId);
+      if (!template) {
+        throw new Error(`Template with ID ${updates.templateId} not found`);
+      }
+      filteredUpdates.template = {
+        id: template.id,
+        name: template.name,
+        type: template.type
+      };
+      delete filteredUpdates.templateId;
+    }
+    
+    // Update the campaign
+    const updatedCampaign = {
+      ...this.campaigns[campaignIndex],
+      ...filteredUpdates,
+      updatedAt: new Date().toISOString()
+    };
+    
+    this.campaigns[campaignIndex] = updatedCampaign;
+    return updatedCampaign;
+  }
+
+  // Clone an existing campaign
+  cloneCampaign(campaignId, newName) {
+    const sourceCampaign = this.campaigns.find(c => c.id === campaignId);
+    if (!sourceCampaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // Create a new campaign based on the source
+    const clonedCampaign = {
+      ...JSON.parse(JSON.stringify(sourceCampaign)),
+      id: this.generateUniqueId(),
+      name: newName || `Copy of ${sourceCampaign.name}`,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metrics: {
+        sent: 0,
+        delivered: 0,
+        failed: 0,
+        responses: 0,
+        conversions: 0
+      }
+    };
+    
+    this.campaigns.push(clonedCampaign);
+    return clonedCampaign;
+  }
+
+  // Archive a campaign (soft delete)
+  archiveCampaign(campaignId) {
+    const campaignIndex = this.campaigns.findIndex(c => c.id === campaignId);
+    if (campaignIndex === -1) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // Update status to archived
+    this.campaigns[campaignIndex].status = 'archived';
+    this.campaigns[campaignIndex].updatedAt = new Date().toISOString();
+    
+    return this.campaigns[campaignIndex];
+  }
+
+  // Get all campaigns
+  getAllCampaigns(includeArchived = false) {
+    if (includeArchived) {
+      return this.campaigns;
+    }
+    return this.campaigns.filter(c => c.status !== 'archived');
+  }
+
+  // Get campaigns by status
+  getCampaignsByStatus(status) {
+    return this.campaigns.filter(c => c.status === status);
+  }
+
+  // Get campaigns by type
+  getCampaignsByType(type) {
+    return this.campaigns.filter(c => c.type === type);
+  }
+
+  // Get a specific campaign by ID
+  getCampaignById(campaignId) {
+    return this.campaigns.find(c => c.id === campaignId);
+  }
+
+  // Activate a campaign
+  activateCampaign(campaignId) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // Validate campaign before activation
+    const validation = this.validateCampaign(campaign);
+    if (!validation.isValid) {
+      throw new Error(`Campaign validation failed: ${validation.errors.join(', ')}`);
+    }
+    
+    // Update status based on schedule
+    if (campaign.schedule.type === 'immediate') {
+      campaign.status = 'active';
+      campaign.executionStartedAt = new Date().toISOString();
+      
+      // In a real implementation, this would trigger the actual sending process
+      // For this demo, we'll just update the status
+      setTimeout(() => {
+        campaign.status = 'completed';
+        campaign.executionCompletedAt = new Date().toISOString();
+        campaign.metrics.sent = campaign.segment.estimatedSize;
+        campaign.metrics.delivered = Math.floor(campaign.segment.estimatedSize * 0.98);
+        campaign.metrics.failed = campaign.segment.estimatedSize - campaign.metrics.delivered;
+        campaign.metrics.responses = Math.floor(campaign.metrics.delivered * 0.15);
+        campaign.metrics.conversions = Math.floor(campaign.metrics.responses * 0.3);
+      }, 5000);
+    } else if (campaign.schedule.type === 'scheduled') {
+      campaign.status = 'scheduled';
+      
+      // In a real implementation, this would schedule the campaign for future execution
+      // For this demo, we'll just update the status
+      const scheduledTime = new Date(campaign.schedule.datetime).getTime();
+      const currentTime = new Date().getTime();
+      const timeUntilExecution = scheduledTime - currentTime;
+      
+      if (timeUntilExecution <= 0) {
+        // If scheduled time is in the past, execute immediately
+        campaign.status = 'active';
+        campaign.executionStartedAt = new Date().toISOString();
+        
+        setTimeout(() => {
+          campaign.status = 'completed';
+          campaign.executionCompletedAt = new Date().toISOString();
+          campaign.metrics.sent = campaign.segment.estimatedSize;
+          campaign.metrics.delivered = Math.floor(campaign.segment.estimatedSize * 0.98);
+          campaign.metrics.failed = campaign.segment.estimatedSize - campaign.metrics.delivered;
+          campaign.metrics.responses = Math.floor(campaign.metrics.delivered * 0.15);
+          campaign.metrics.conversions = Math.floor(campaign.metrics.responses * 0.3);
+        }, 5000);
+      }
+    } else if (campaign.schedule.type === 'recurring') {
+      campaign.status = 'active';
+      
+      // In a real implementation, this would set up recurring execution
+      // For this demo, we'll just update the status
+    }
+    
+    campaign.updatedAt = new Date().toISOString();
+    return campaign;
+  }
+
+  // Pause a campaign
+  pauseCampaign(campaignId) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    if (campaign.status !== 'active' && campaign.status !== 'scheduled') {
+      throw new Error(`Cannot pause campaign with status ${campaign.status}`);
+    }
+    
+    campaign.status = 'paused';
+    campaign.updatedAt = new Date().toISOString();
+    return campaign;
+  }
+
+  // Resume a paused campaign
+  resumeCampaign(campaignId) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    if (campaign.status !== 'paused') {
+      throw new Error(`Cannot resume campaign with status ${campaign.status}`);
+    }
+    
+    // Restore previous status
+    if (campaign.schedule.type === 'immediate' || campaign.schedule.type === 'recurring') {
+      campaign.status = 'active';
+    } else if (campaign.schedule.type === 'scheduled') {
+      campaign.status = 'scheduled';
+    }
+    
+    campaign.updatedAt = new Date().toISOString();
+    return campaign;
+  }
+
+  // Cancel a campaign
+  cancelCampaign(campaignId) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    if (campaign.status === 'completed' || campaign.status === 'cancelled' || campaign.status === 'archived') {
+      throw new Error(`Cannot cancel campaign with status ${campaign.status}`);
+    }
+    
+    campaign.status = 'cancelled';
+    campaign.updatedAt = new Date().toISOString();
+    return campaign;
+  }
+
+  // Test a campaign with a small sample
+  testCampaign(campaignId, testSize = 10) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // In a real implementation, this would send actual test messages
+    // For this demo, we'll return a mock result
+    return {
+      campaignId,
+      testSize,
+      sentAt: new Date().toISOString(),
+      deliveryRate: 0.98,
+      responseRate: 0.15,
+      testRecipients: this.generateMockRecipients(testSize)
+    };
+  }
+
+  // Get campaign performance metrics
+  getCampaignMetrics(campaignId) {
+    const campaign = this.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign with ID ${campaignId} not found`);
+    }
+    
+    // In a real implementation, this would calculate actual metrics
+    // For this demo, we'll return the stored metrics with some additional calculated values
+    const { sent, delivered, failed, responses, conversions } = campaign.metrics;
+    
+    return {
+      ...campaign.metrics,
+      deliveryRate: sent > 0 ? delivered / sent : 0,
+      failureRate: sent > 0 ? failed / sent : 0,
+      responseRate: delivered > 0 ? responses / delivered : 0,
+      conversionRate: responses > 0 ? conversions / responses : 0,
+      costPerMessage: 0.01, // Assuming ₦0.01 per message
+      totalCost: sent * 0.01,
+      roi: conversions * 10 - sent * 0.01 // Assuming ₦10 value per conversion
+    };
+  }
+
+  // Validate a campaign before activation
+  validateCampaign(campaign) {
+    const errors = [];
+    
+    // Check required fields
+    if (!campaign.name) {
+      errors.push('Campaign name is required');
+    }
+    
+    if (!campaign.segment || !campaign.segment.id) {
+      errors.push('Target segment is required');
+    }
+    
+    if (!campaign.template || !campaign.template.id) {
+      errors.push('Notification template is required');
+    }
+    
+    // Validate schedule
+    if (!campaign.schedule || !campaign.schedule.type) {
+      errors.push('Schedule type is required');
     } else {
-        // User is not logged in, redirect to login page
-        window.location.href = 'index.html';
-    }
-});
-
-// Set up event listeners
-function setupEventListeners() {
-    // Logout
-    document.getElementById('logout-link').addEventListener('click', handleLogout);
-    
-    // Create campaign button
-    document.getElementById('create-campaign-btn').addEventListener('click', showCreateCampaignModal);
-    
-    // Campaign type change
-    document.getElementById('campaign-type').addEventListener('change', handleCampaignTypeChange);
-    
-    // Daily limit checkbox
-    document.getElementById('daily-limit-check').addEventListener('change', function() {
-        document.getElementById('daily-limit-input').style.display = this.checked ? 'block' : 'none';
-    });
-    
-    // Entry criteria change
-    document.getElementById('entry-criteria').addEventListener('change', function() {
-        document.getElementById('criteria-value-input').style.display = 
-            (this.value === 'min' || this.value === 'points') ? 'block' : 'none';
-    });
-    
-    // Require top-up checkbox
-    document.getElementById('require-topup-check').addEventListener('change', function() {
-        document.getElementById('require-topup-input').style.display = this.checked ? 'block' : 'none';
-    });
-    
-    // Reminder notification checkbox
-    document.getElementById('reminder-notification-check').addEventListener('change', function() {
-        document.getElementById('reminder-frequency-input').style.display = this.checked ? 'block' : 'none';
-    });
-    
-    // Custom audience radio
-    document.getElementById('custom-audience-radio').addEventListener('change', function() {
-        document.getElementById('custom-audience-options').style.display = this.checked ? 'block' : 'none';
-    });
-    
-    document.getElementById('all-users-radio').addEventListener('change', function() {
-        document.getElementById('custom-audience-options').style.display = 'none';
-    });
-    
-    document.getElementById('active-users-radio').addEventListener('change', function() {
-        document.getElementById('custom-audience-options').style.display = 'none';
-    });
-    
-    // Save campaign button
-    document.getElementById('save-campaign-btn').addEventListener('click', handleSaveCampaign);
-    
-    // View campaign results buttons
-    document.querySelectorAll('.btn-outline-primary').forEach(button => {
-        if (button.textContent === 'View Results') {
-            button.addEventListener('click', (e) => {
-                const campaignName = e.target.closest('tr').querySelector('td:first-child').textContent;
-                showCampaignResultsModal(campaignName);
-            });
+      if (campaign.schedule.type === 'scheduled' && !campaign.schedule.datetime) {
+        errors.push('Scheduled datetime is required for scheduled campaigns');
+      }
+      
+      if (campaign.schedule.type === 'recurring') {
+        if (!campaign.recurringPattern) {
+          errors.push('Recurring pattern is required for recurring campaigns');
         }
-    });
-    
-    // Export results button
-    document.getElementById('export-results-btn').addEventListener('click', handleExportResults);
-}
-
-// Handle logout
-function handleLogout() {
-    // Clear auth token and user info
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    
-    // Redirect to login page
-    window.location.href = 'index.html';
-}
-
-// Show create campaign modal
-function showCreateCampaignModal() {
-    // Reset form
-    document.getElementById('campaign-form').reset();
-    
-    // Hide all campaign rule sections
-    document.getElementById('bonus-rules').style.display = 'none';
-    document.getElementById('special-rules').style.display = 'none';
-    document.getElementById('referral-rules').style.display = 'none';
-    document.getElementById('custom-rules').style.display = 'none';
-    
-    // Hide other conditional sections
-    document.getElementById('daily-limit-input').style.display = 'none';
-    document.getElementById('criteria-value-input').style.display = 'none';
-    document.getElementById('reminder-frequency-input').style.display = 'none';
-    document.getElementById('custom-audience-options').style.display = 'none';
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('createCampaignModal'));
-    modal.show();
-}
-
-// Handle campaign type change
-function handleCampaignTypeChange() {
-    const campaignType = document.getElementById('campaign-type').value;
-    
-    // Hide all campaign rule sections
-    document.getElementById('bonus-rules').style.display = 'none';
-    document.getElementById('special-rules').style.display = 'none';
-    document.getElementById('referral-rules').style.display = 'none';
-    document.getElementById('custom-rules').style.display = 'none';
-    
-    // Show selected campaign rule section
-    if (campaignType === 'bonus') {
-        document.getElementById('bonus-rules').style.display = 'block';
-    } else if (campaignType === 'special') {
-        document.getElementById('special-rules').style.display = 'block';
-    } else if (campaignType === 'referral') {
-        document.getElementById('referral-rules').style.display = 'block';
-    } else if (campaignType === 'custom') {
-        document.getElementById('custom-rules').style.display = 'block';
-    }
-}
-
-// Handle save campaign
-function handleSaveCampaign() {
-    // Get form values
-    const name = document.getElementById('campaign-name').value;
-    const type = document.getElementById('campaign-type').value;
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    const description = document.getElementById('campaign-description').value;
-    
-    // Validate form
-    if (!name || !type || !startDate || !endDate || !description) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    // Validate date range
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    if (start >= end) {
-        alert('End date must be after start date');
-        return;
-    }
-    
-    // Get current date
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    // In a real application, this would make an API call to save the campaign
-    // For now, we'll just show a success message and update the UI
-    
-    if (start <= today) {
-        // Add to active campaigns
-        addToActiveCampaigns(name, type, startDate, endDate);
-    } else {
-        // Add to upcoming campaigns
-        addToUpcomingCampaigns(name, type, startDate, endDate);
-    }
-    
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('createCampaignModal'));
-    modal.hide();
-    
-    // Show success message
-    alert('Campaign saved successfully!');
-}
-
-// Add to active campaigns
-function addToActiveCampaigns(name, type, startDate, endDate) {
-    const table = document.getElementById('active-campaigns-table');
-    const row = document.createElement('tr');
-    
-    // Format type display name
-    let typeDisplayName = 'Custom Campaign';
-    if (type === 'bonus') {
-        typeDisplayName = 'Bonus Points';
-    } else if (type === 'special') {
-        typeDisplayName = 'Special Draw';
-    } else if (type === 'referral') {
-        typeDisplayName = 'Referral Program';
-    }
-    
-    // Format dates
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
-    const formattedStartDate = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const formattedEndDate = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    row.innerHTML = `
-        <td>${name}</td>
-        <td>${typeDisplayName}</td>
-        <td>${formattedStartDate}</td>
-        <td>${formattedEndDate}</td>
-        <td><span class="badge bg-success">Active</span></td>
-        <td>0</td>
-        <td>
-            <button class="btn btn-sm btn-outline-primary">View</button>
-            <button class="btn btn-sm btn-outline-warning">Pause</button>
-            <button class="btn btn-sm btn-outline-danger">End</button>
-        </td>
-    `;
-    
-    table.insertBefore(row, table.firstChild);
-}
-
-// Add to upcoming campaigns
-function addToUpcomingCampaigns(name, type, startDate, endDate) {
-    const table = document.getElementById('upcoming-campaigns-table');
-    const row = document.createElement('tr');
-    
-    // Format type display name
-    let typeDisplayName = 'Custom Campaign';
-    if (type === 'bonus') {
-        typeDisplayName = 'Bonus Points';
-    } else if (type === 'special') {
-        typeDisplayName = 'Special Draw';
-    } else if (type === 'referral') {
-        typeDisplayName = 'Referral Program';
-    }
-    
-    // Format dates
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
-    const formattedStartDate = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const formattedEndDate = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    row.innerHTML = `
-        <td>${name}</td>
-        <td>${typeDisplayName}</td>
-        <td>${formattedStartDate}</td>
-        <td>${formattedEndDate}</td>
-        <td><span class="badge bg-warning">Scheduled</span></td>
-        <td>
-            <button class="btn btn-sm btn-outline-primary">Edit</button>
-            <button class="btn btn-sm btn-outline-danger">Cancel</button>
-        </td>
-    `;
-    
-    table.insertBefore(row, table.firstChild);
-}
-
-// Show campaign results modal
-function showCampaignResultsModal(campaignName) {
-    // Set modal title
-    document.getElementById('campaignResultsModalLabel').textContent = `${campaignName} - Results`;
-    
-    // Set campaign details
-    document.getElementById('result-campaign-name').textContent = campaignName;
-    
-    // Set campaign type based on name (in a real app, this would come from the API)
-    let campaignType = 'Bonus Points';
-    if (campaignName === 'Valentine\'s Special') {
-        campaignType = 'Special Draw';
-    }
-    document.getElementById('result-campaign-type').textContent = campaignType;
-    
-    // Set campaign duration
-    let duration = 'Mar 1, 2025 - Mar 31, 2025';
-    if (campaignName === 'Valentine\'s Special') {
-        duration = 'Feb 10, 2025 - Feb 14, 2025';
-    } else if (campaignName === 'New Year Kickoff') {
-        duration = 'Jan 1, 2025 - Jan 15, 2025';
-    }
-    document.getElementById('result-campaign-duration').textContent = duration;
-    
-    // Set campaign status
-    document.getElementById('result-campaign-status').innerHTML = '<span class="badge bg-secondary">Completed</span>';
-    
-    // Set campaign statistics
-    let participants = 412;
-    let transactions = 856;
-    let totalAmount = '₦245,780';
-    let totalPoints = 4856;
-    
-    if (campaignName === 'Valentine\'s Special') {
-        participants = 287;
-        transactions = 512;
-        totalAmount = '₦178,450';
-        totalPoints = 3245;
-    } else if (campaignName === 'New Year Kickoff') {
-        participants = 356;
-        transactions = 723;
-        totalAmount = '₦210,320';
-        totalPoints = 4120;
-    }
-    
-    document.getElementById('result-participants').textContent = participants;
-    document.getElementById('result-transactions').textContent = transactions;
-    document.getElementById('result-total-amount').textContent = totalAmount;
-    document.getElementById('result-total-points').textContent = totalPoints;
-    
-    // Populate top participants table
-    const topParticipantsTable = document.getElementById('top-participants-table');
-    topParticipantsTable.innerHTML = '';
-    
-    // Generate mock top participants
-    const topParticipants = generateMockTopParticipants(5);
-    
-    topParticipants.forEach(participant => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${participant.msisdn}</td>
-            <td>${participant.transactions}</td>
-            <td>₦${participant.amount}</td>
-            <td>${participant.points}</td>
-        `;
-        topParticipantsTable.appendChild(row);
-    });
-    
-    // Create performance chart
-    createPerformanceChart();
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('campaignResultsModal'));
-    modal.show();
-}
-
-// Generate mock top participants
-function generateMockTopParticipants(count) {
-    const participants = [];
-    
-    for (let i = 0; i < count; i++) {
-        participants.push({
-            msisdn: `234${Math.floor(7000000000 + Math.random() * 1000000000)}`,
-            transactions: Math.floor(5 + Math.random() * 20),
-            amount: Math.floor(5000 + Math.random() * 15000),
-            points: Math.floor(50 + Math.random() * 200)
-        });
-    }
-    
-    // Sort by points (descending)
-    participants.sort((a, b) => b.points - a.points);
-    
-    return participants;
-}
-
-// Create performance chart
-function createPerformanceChart() {
-    // Destroy existing chart if it exists
-    if (performanceChart) {
-        performanceChart.destroy();
-    }
-    
-    // Get chart canvas
-    const ctx = document.getElementById('performance-chart').getContext('2d');
-    
-    // Generate mock data
-    const labels = [];
-    const transactionsData = [];
-    const pointsData = [];
-    
-    // Generate 30 days of data
-    for (let i = 1; i <= 30; i++) {
-        labels.push(`Mar ${i}`);
-        transactionsData.push(Math.floor(10 + Math.random() * 40));
-        pointsData.push(Math.floor(20 + Math.random() * 200));
-    }
-    
-    // Create chart
-    performanceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Transactions',
-                    data: transactionsData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    tension: 0.4,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Points',
-                    data: pointsData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.4,
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Transactions'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Points'
-                    },
-                    grid: {
-                        drawOnChartArea: false
-                    }
-                }
-            }
+        
+        if (!campaign.recurringTime) {
+          errors.push('Recurring time is required for recurring campaigns');
         }
-    });
-}
-
-// Handle export results
-function handleExportResults() {
-    // In a real application, this would generate a CSV or Excel file
-    // For now, we'll just show an alert
-    alert('Campaign results exported!');
-}
+        
+        if (campaign.recurringPattern === 'weekly' && (!campaign.recurringDays || campaign.recurringDays.length === 0)) {
+          errors.push('At least one day of the week must be selected for weekly recurring campaigns');
+        }
+        
+        if (campaign.recurringPattern === 'monthly' && (!campaign.recurringDays || campaign.recurringDays.length === 0)) {
+          errors.push('At least one day of the month must be selected for monthly recurring campaigns');
+        }
+      }
+    }
+    
+    // Validate type-specific requirements
+    if (campaign.type === 'triggered' && !campaign.triggerType) {
+      errors.push('Trigger type is required for triggered campaigns');
+    }
+    
+    if (campaign.type === 'multiStep' && (!campaign.steps || campaign.steps.length === 0)) {
+      errors.push('At least one step is required for multi-step campaigns');
+    }
+    
+    if (campaign.type === 'abTest' && (!c
+(Content truncated due to size limit. Use line ranges to read in chunks)

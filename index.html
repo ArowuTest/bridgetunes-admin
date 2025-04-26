@@ -187,60 +187,8 @@
       animation: slideUp 0.5s ease-in-out 0.1s both;
     }
 
-    .tab-container {
-      display: flex;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid var(--light-color);
-    }
-
-    .tab {
-      padding: 0.75rem 1.5rem;
-      background: none;
-      border: none;
-      font-size: 1rem;
-      font-weight: 400;
-      color: var(--gray-color);
-      cursor: pointer;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .tab.active {
-      font-weight: 600;
-      color: var(--primary-color);
-    }
-
-    .tab:after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: transparent;
-      transition: all 0.3s ease;
-    }
-
-    .tab.active:after {
-      background-color: var(--primary-color);
-    }
-
-    .tab:hover:after {
-      background-color: var(--light-color);
-    }
-
-    .tab.active:hover:after {
-      background-color: var(--primary-color);
-    }
-
     .login-form {
       display: flex;
-      flex-direction: column;
-      animation: slideUp 0.5s ease-in-out 0.2s both;
-    }
-
-    .register-form {
-      display: none;
       flex-direction: column;
       animation: slideUp 0.5s ease-in-out 0.2s both;
     }
@@ -442,14 +390,9 @@
     </div>
     
     <div class="form-section">
-      <div id="login-register-container">
+      <div id="login-container">
         <h2 class="form-title">Welcome Back</h2>
         <p class="form-subtitle">Sign in to access your admin dashboard</p>
-        
-        <div class="tab-container">
-          <button class="tab active" id="login-tab">Login</button>
-          <button class="tab" id="register-tab">Register</button>
-        </div>
         
         <div id="alert-container"></div>
         
@@ -477,41 +420,6 @@
             Sign In
           </button>
         </form>
-        
-        <form class="register-form" id="register-form">
-          <div class="form-group">
-            <div class="input-icon">
-              <i class="fas fa-user"></i>
-            </div>
-            <input type="text" class="form-input" id="register-username" placeholder="Username" required>
-          </div>
-          
-          <div class="form-group">
-            <div class="input-icon">
-              <i class="fas fa-envelope"></i>
-            </div>
-            <input type="email" class="form-input" id="register-email" placeholder="Email Address" required>
-          </div>
-          
-          <div class="form-group">
-            <div class="input-icon">
-              <i class="fas fa-lock"></i>
-            </div>
-            <input type="password" class="form-input" id="register-password" placeholder="Password" required>
-          </div>
-          
-          <div class="form-group">
-            <div class="input-icon">
-              <i class="fas fa-lock"></i>
-            </div>
-            <input type="password" class="form-input" id="register-confirm-password" placeholder="Confirm Password" required>
-          </div>
-          
-          <button type="submit" class="submit-button" id="register-button">
-            <i class="fas fa-user-plus"></i>
-            Create Account
-          </button>
-        </form>
       </div>
       
       <div class="verification-section" id="verification-section">
@@ -532,37 +440,8 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Tab switching
-      const loginTab = document.getElementById('login-tab');
-      const registerTab = document.getElementById('register-tab');
-      const loginForm = document.getElementById('login-form');
-      const registerForm = document.getElementById('register-form');
-      const formTitle = document.querySelector('.form-title');
-      const formSubtitle = document.querySelector('.form-subtitle');
-      const loginRegisterContainer = document.getElementById('login-register-container');
-      const verificationSection = document.getElementById('verification-section');
-      const verificationEmail = document.getElementById('verification-email');
-      const alertContainer = document.getElementById('alert-container');
-      const loginButton = document.getElementById('login-button');
-      const registerButton = document.getElementById('register-button');
-      const resendButton = document.getElementById('resend-button');
-      
-      loginTab.addEventListener('click', function() {
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-        loginForm.style.display = 'flex';
-        registerForm.style.display = 'none';
-        formTitle.textContent = 'Welcome Back';
-        formSubtitle.textContent = 'Sign in to access your admin dashboard';
-      });
-      
-      registerTab.addEventListener('click', function() {
-        registerTab.classList.add('active');
-        loginTab.classList.remove('active');
-        registerForm.style.display = 'flex';
-        loginForm.style.display = 'none';
-        formTitle.textContent = 'Create Account';
-        formSubtitle.textConten
-(Content truncated due to size limit. Use line ranges to read in chunks)
+  <script src="js/admin-auth.js"></script>
+  <script src="js/admin-recovery.js"></script>
+</body>
+</html>
+

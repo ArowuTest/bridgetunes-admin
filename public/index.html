@@ -4,303 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bridgetunes Admin Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/admin-styles.css">
-    <!-- Add axios for API calls -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 </head>
 <body>
-    <div class="background-pattern"></div>
-    
     <!-- Login Page -->
-    <div id="login-page" class="login-container">
-        <div class="brand-section">
-            <div class="brand-pattern"></div>
-            <h1 class="brand-title">Bridgetunes</h1>
-            <p class="brand-subtitle">MTN Admin Portal</p>
-            
-            <ul class="feature-list">
-                <li class="feature-item">User Management</li>
-                <li class="feature-item">Draw Engine</li>
-                <li class="feature-item">Notification System</li>
-                <li class="feature-item">Campaign Management</li>
-                <li class="feature-item">Analytics Dashboard</li>
-            </ul>
-        </div>
-        
-        <div class="form-section">
-            <h2 class="form-title">Welcome Back</h2>
-            <p class="form-subtitle">Sign in to your account to continue</p>
-            
+    <div id="login-page" class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="img/logo.png" alt="Bridgetunes Logo" class="login-logo">
+                <h2>Admin Portal</h2>
+            </div>
             <div id="alert-container"></div>
-            
-            <!-- Client-side form handling - NO action or method attributes to prevent default submission -->
             <form id="login-form" class="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
-                    </div>
+                <div class="mb-3">
+                    <label for="login-email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="login-email" placeholder="Enter your email" required>
                 </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="login-password" name="password" placeholder="Enter your password" required>
-                    </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required>
                 </div>
-                <div class="form-actions">
-                    <button type="button" id="login-button" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember-me">
+                    <label class="form-check-label" for="remember-me">Remember me</label>
                 </div>
-                <div class="form-links">
-                    <a href="#" id="forgot-password-link">Forgot Password?</a>
+                <button type="submit" class="btn btn-primary w-100" id="login-button">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                <div class="mt-3 text-center">
+                    <a href="#forgot-password" class="forgot-password-link">Forgot Password?</a>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Dashboard Page -->
-    <div id="dashboard-page" class="dashboard-container" style="display: none;">
+    <div id="dashboard-page" class="dashboard-page" style="display: none;">
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar">
+        <div class="sidebar">
             <div class="sidebar-header">
-                <img src="https://via.placeholder.com/40x40?text=B" alt="Bridgetunes Logo" class="sidebar-logo">
-                <h2>Bridgetunes</h2>
+                <img src="img/logo.png" alt="Bridgetunes Logo" class="sidebar-logo">
+                <h3>Bridgetunes</h3>
             </div>
             <div class="sidebar-user">
                 <div class="user-avatar" id="user-avatar">A</div>
                 <div class="user-info">
                     <div class="user-name" id="admin-username">Admin User</div>
-                    <div class="user-type" id="admin-user-type">Admin</div>
+                    <div class="user-role" id="admin-user-type">Admin</div>
                 </div>
             </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li>
-                        <a href="#dashboard" class="nav-link active" data-page="dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#notification" class="nav-link" data-page="notification">
-                            <i class="fas fa-bell"></i>
-                            <span>Notification Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#draw" class="nav-link" data-page="draw">
-                            <i class="fas fa-random"></i>
-                            <span>Draw Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#user" class="nav-link" data-page="user">
-                            <i class="fas fa-users"></i>
-                            <span>User Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#transaction" class="nav-link" data-page="transaction">
-                            <i class="fas fa-exchange-alt"></i>
-                            <span>Transaction Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#report" class="nav-link" data-page="report">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#setting" class="nav-link" data-page="setting">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#notification" class="nav-link" data-page="notification">
+                        <i class="fas fa-bell"></i> Notification Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#draw" class="nav-link" data-page="draw">
+                        <i class="fas fa-random"></i> Draw Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#user" class="nav-link" data-page="user">
+                        <i class="fas fa-users"></i> User Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#transaction" class="nav-link" data-page="transaction">
+                        <i class="fas fa-exchange-alt"></i> Transaction Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#reports" class="nav-link" data-page="reports">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#settings" class="nav-link" data-page="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+            </ul>
             <div class="sidebar-footer">
-                <button id="logout-button" class="btn btn-outline">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                <button id="logout-button" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div id="main-content" class="main-content">
+        <div class="main-content">
             <!-- Dashboard Content -->
             <div id="dashboard-content" class="page-content">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                </div>
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">5,432</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">12,345</div>
-                            <div class="stat-label">Total Topups</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">₦5,000,000</div>
-                            <div class="stat-label">Current Jackpot</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">3,456</div>
-                            <div class="stat-label">Notifications Sent</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h2>User Growth</h2>
-                        </div>
-                        <div class="chart-content">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-line"></i>
-                                <span>User Growth Chart</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h2>Top-up Distribution</h2>
-                        </div>
-                        <div class="chart-content">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-pie"></i>
-                                <span>Top-up Distribution Chart</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="recent-activity">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Recent Activity</h2>
-                        </div>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Action</th>
-                                        <th>Time</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>John Doe</td>
-                                        <td>Top-up ₦500</td>
-                                        <td>2 hours ago</td>
-                                        <td><span class="status-badge status-active">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jane Smith</td>
-                                        <td>Opt-in to promotion</td>
-                                        <td>3 hours ago</td>
-                                        <td><span class="status-badge status-active">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Michael Johnson</td>
-                                        <td>Top-up ₦1,000</td>
-                                        <td>5 hours ago</td>
-                                        <td><span class="status-badge status-active">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sarah Williams</td>
-                                        <td>Top-up ₦200</td>
-                                        <td>6 hours ago</td>
-                                        <td><span class="status-badge status-active">Completed</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <h2>Dashboard</h2>
+                <div id="dashboard-container"></div>
             </div>
-            
-            <!-- Other content sections will be added here -->
+
+            <!-- Notification Management Content -->
             <div id="notification-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Notification Management</h1>
-                </div>
-                <!-- Notification content will be added here -->
+                <h2>Notification Management</h2>
+                <div id="notification-container"></div>
             </div>
-            
+
+            <!-- Draw Management Content -->
             <div id="draw-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Draw Management</h1>
-                </div>
-                <!-- Draw content will be added here -->
+                <h2>Draw Management</h2>
+                <div id="draw-container"></div>
             </div>
-            
+
+            <!-- User Management Content -->
             <div id="user-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>User Management</h1>
-                </div>
-                <!-- User content will be added here -->
+                <h2>User Management</h2>
+                <div id="user-container"></div>
             </div>
-            
+
+            <!-- Transaction Management Content -->
             <div id="transaction-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Transaction Management</h1>
-                </div>
-                <!-- Transaction content will be added here -->
+                <h2>Transaction Management</h2>
+                <div id="transaction-container"></div>
             </div>
-            
-            <div id="report-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Reports</h1>
-                </div>
-                <!-- Report content will be added here -->
+
+            <!-- Reports Content -->
+            <div id="reports-content" class="page-content" style="display: none;">
+                <h2>Reports</h2>
+                <div id="reports-container"></div>
             </div>
-            
-            <div id="setting-content" class="page-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Settings</h1>
-                </div>
-                <!-- Settings content will be added here -->
+
+            <!-- Settings Content -->
+            <div id="settings-content" class="page-content" style="display: none;">
+                <h2>Settings</h2>
+                <div id="settings-container"></div>
             </div>
         </div>
     </div>
 
-    <!-- Add script references -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin Portal JS -->
     <script src="js/admin-portal.js"></script>
-    <script src="js/mongodb-service.js"></script>
-    <script src="js/notification-management-service.js"></script>
-    <script src="js/draw-management-service.js"></script>
-    <script src="js/user-management-service.js"></script>
-    <script src="js/csv-upload-service.js"></script>
-    <script src="js/admin-portal-integration.js"></script>
+    <!-- Admin Portal Direct Integration JS -->
+    <script src="js/admin-portal-direct-integration.js"></script>
 </body>
 </html>
 
